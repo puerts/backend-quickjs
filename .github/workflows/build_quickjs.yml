@@ -17,6 +17,7 @@ jobs:
       run: sudo xcode-select -switch "/Applications/Xcode_12.app"
     - name: Run build script
       run: |
+        cd $GITHUB_WORKSPACE
         sh ./make_osx.sh
         cp -r include ~/qjs/quickjs/Inc
     - uses: actions/upload-artifact@v2
@@ -33,6 +34,7 @@ jobs:
       run: sudo xcode-select -switch "/Applications/Xcode_12.app"
     - name: Run build script
       run: |
+        cd $GITHUB_WORKSPACE
         sh ./make_ios.sh
     - uses: actions/upload-artifact@v2
       with:
@@ -53,6 +55,7 @@ jobs:
         export ANDROID_NDK=~/android-ndk-r21b
     - name: Run build script
       run: |
+        cd $GITHUB_WORKSPACE
         sh ./make_android.sh
     - uses: actions/upload-artifact@v2
       with:
