@@ -18,6 +18,7 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
+        chmod 777 make_osx.sh
         sh ./make_osx.sh
         cp -r include ~/qjs/quickjs/Inc
     - uses: actions/upload-artifact@v2
@@ -35,6 +36,7 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
+        chmod 777 make_ios.sh
         sh ./make_ios.sh
     - uses: actions/upload-artifact@v2
       with:
@@ -56,7 +58,8 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
-        sh ./make_android.sh
+        chmod 777 make_android.sh
+        ./make_android.sh
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
