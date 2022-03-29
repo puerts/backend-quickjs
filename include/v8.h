@@ -633,6 +633,17 @@ public:
 
 enum class ArrayBufferCreationMode { kInternalized, kExternalized };
 
+class V8_EXPORT BackingStore {
+public:
+    void* Data() const { return data_; }
+    
+    size_t ByteLength() const { return byte_length_; }
+
+    void* data_;
+    
+    size_t byte_length_;
+};
+
 class V8_EXPORT ArrayBuffer : public Object {
 public:
     class V8_EXPORT Allocator { // NOLINT
@@ -661,6 +672,8 @@ public:
                                   ArrayBufferCreationMode mode = ArrayBufferCreationMode::kExternalized);
     
     Contents GetContents();
+
+    std::shared_ptr<BackingStore> GetBackingStore();
     
     V8_INLINE static ArrayBuffer* Cast(Value* obj) {
         return static_cast<ArrayBuffer*>(obj);

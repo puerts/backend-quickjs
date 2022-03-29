@@ -203,7 +203,7 @@ void Isolate::SetPromiseRejectCallback(PromiseRejectCallback cb) {
                                                    JSValueConst reason,
                                                    JS_BOOL is_handled, void *opaque) {
         PromiseRejectCallback callback = (PromiseRejectCallback)opaque;
-                auto sptr = (*reinterpret_cast<std::weak_ptr<Context>*>(JS_GetContextOpaque2(ctx))).lock();
+        auto sptr = (*reinterpret_cast<std::weak_ptr<Context>*>(JS_GetContextOpaque(ctx))).lock();
         Isolate* isolate = sptr->GetIsolate();
 
         Isolate::Scope isolateScope(isolate);
@@ -623,6 +623,13 @@ ArrayBuffer::Contents ArrayBuffer::GetContents() {
     ArrayBuffer::Contents ret;
     ret.data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &ret.byte_length_, value_);
     return ret;
+}
+
+std::shared_ptr<BackingStore> ArrayBuffer::GetBackingStore() {
+    BackingStore *ret = new BackingStore;
+    ret->data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &ret->byte_length_, value_);
+    std::shared_ptr<BackingStore> ptr(ret);
+    return ptr;
 }
 
 Local<ArrayBuffer> ArrayBufferView::Buffer() {
