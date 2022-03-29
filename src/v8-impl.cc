@@ -203,14 +203,12 @@ void Isolate::SetPromiseRejectCallback(PromiseRejectCallback cb) {
                                                    JSValueConst reason,
                                                    JS_BOOL is_handled, void *opaque) {
         PromiseRejectCallback callback = (PromiseRejectCallback)opaque;
-        auto sptr = (*reinterpret_cast<std::weak_ptr<Context>*>(JS_GetContextOpaque(ctx))).lock();
+        auto sptr = reinterpret_cast<Context*>(JS_GetContextOpaque(ctx));
         Isolate* isolate = sptr->GetIsolate();
 
         Isolate::Scope isolateScope(isolate);
         HandleScope handleScope(isolate);
-        v8::Local<v8::Context> context;
-        context.val_ = sptr;
-        v8::Context::Scope contextScope(context);
+        v8::Context::Scope contextScope(Local<Context>(context));
 
         callback(PromiseRejectMessage(promise, is_handled ? kPromiseHandlerAddedAfterReject : kPromiseRejectWithNoHandler, reason));
     }, (void*)cb);
