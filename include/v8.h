@@ -755,8 +755,8 @@ public:
         return new Isolate();
     }
     
-    V8_INLINE static Isolate* New(void* external_runtime) {
-        return new Isolate(external_runtime);
+    V8_INLINE static Isolate* New(void* external_context) {
+        return new Isolate(external_context);
     }
 
     V8_INLINE void Dispose() {
@@ -785,7 +785,7 @@ public:
 
     Isolate();
     
-    Isolate(void* external_runtime);
+    Isolate(void* external_context);
 
     ~Isolate();
     
