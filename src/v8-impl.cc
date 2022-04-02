@@ -304,6 +304,10 @@ bool Value::IsInt32() const {
     return JS_IsNumber(value_);
 }
 
+bool Value::IsUint32() const{
+    return JS_IsNumber(value_);
+}
+
 MaybeLocal<BigInt> Value::ToBigInt(Local<Context> context) const {
     if (IsBigInt()) {
         return MaybeLocal<BigInt>(Local<BigInt>(static_cast<BigInt*>(const_cast<Value*>(this))));

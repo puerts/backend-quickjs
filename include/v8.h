@@ -529,6 +529,8 @@ public:
     
     bool IsInt32() const;
     
+    bool IsUint32() const;
+    
     V8_WARN_UNUSED_RESULT MaybeLocal<BigInt> ToBigInt(
         Local<Context> context) const;
     
