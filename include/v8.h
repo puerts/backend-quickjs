@@ -516,6 +516,8 @@ public:
     bool IsDate() const;
 
     bool IsObject() const;
+    
+    bool IsArray() const;
 
     bool IsBigInt() const;
 

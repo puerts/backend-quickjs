@@ -280,6 +280,10 @@ bool Value::IsObject() const {
     return JS_IsObject(value_);
 }
 
+bool Value::IsArray() const {
+    return JS_IsArray(Isolate::current_->GetCurrentContext()->context_, value_);
+}
+
 bool Value::IsBigInt() const {
     return JS_VALUE_GET_TAG(value_) == JS_TAG_BIG_INT;
 }
