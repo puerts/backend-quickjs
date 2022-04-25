@@ -224,6 +224,29 @@ Local<Value> Exception::Error(Local<String> message) {
     return Local<Value>(val);
 }
 
+Local<Message> v8::Exception::CreateMessage(Isolate* isolate_, Local<Value> exception) {
+    JSValueConst catched_ = exception->value_;
+    JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_fileName);
+    JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_lineNumber);
+    
+    Local<v8::Message> message(new v8::Message());
+    
+    if (JS_IsUndefined(fileNameVal)) {
+        message->resource_name_ = "<unknow>";
+        message->line_number_ = - 1;
+    } else {
+        const char* fileName = JS_ToCString(isolate_->current_context_->context_, fileNameVal);
+        message->resource_name_ = fileName;
+        JS_FreeCString(isolate_->current_context_->context_, fileName);
+        JS_ToInt32(isolate_->current_context_->context_, &message->line_number_, lineNumVal);
+    }
+    
+    JS_FreeValue(isolate_->current_context_->context_, lineNumVal);
+    JS_FreeValue(isolate_->current_context_->context_, fileNameVal);
+    
+    return message;
+}
+
 void HandleScope::Escape_(JSValue* val) {
     if (JS_VALUE_HAS_REF_COUNT(*val)) {
         if (escapes_.find(val) == escapes_.end()) {
@@ -1181,6 +1204,14 @@ Local<Value> TryCatch::Exception() const {
 MaybeLocal<Value> TryCatch::StackTrace(Local<Context> context) const {
     auto str = context->GetIsolate()->Alloc<String>();
     str->value_ = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_stack);;
+    return MaybeLocal<Value>(Local<String>(str));
+}
+
+MaybeLocal<Value> TryCatch::StackTrace(
+        Local<Context> context, Local<Value> exception) {
+    auto isolate_ = context->GetIsolate();
+    auto str = isolate_->Alloc<String>();
+    str->value_ = JS_GetProperty(isolate_->current_context_->context_, exception->value_, JS_ATOM_stack);
     return MaybeLocal<Value>(Local<String>(str));
 }
     

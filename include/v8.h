@@ -856,6 +856,8 @@ public:
 class V8_EXPORT Exception {
 public:
     static Local<Value> Error(Local<String> message);
+
+    static Local<Message> CreateMessage(Isolate* isolate, Local<Value> exception);
 };
 
 V8_INLINE Local<Primitive> Undefined(Isolate* isolate) {
@@ -1601,6 +1603,9 @@ public:
     TryCatch* prev_;
     
     V8_WARN_UNUSED_RESULT MaybeLocal<Value> StackTrace(Local<Context> context) const;
+
+    V8_WARN_UNUSED_RESULT static MaybeLocal<Value> StackTrace(
+        Local<Context> context, Local<Value> exception);
 };
 
 template <typename T>
