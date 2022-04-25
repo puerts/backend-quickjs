@@ -679,6 +679,8 @@ public:
 
     std::shared_ptr<BackingStore> GetBackingStore();
     
+    std::shared_ptr<BackingStore> BackingStore_;
+    
     V8_INLINE static ArrayBuffer* Cast(Value* obj) {
         return static_cast<ArrayBuffer*>(obj);
     }

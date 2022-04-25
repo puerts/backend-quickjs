@@ -637,6 +637,11 @@ Local<ArrayBuffer> ArrayBuffer::New(Isolate* isolate, size_t byte_length) {
     ArrayBuffer *ab = isolate->Alloc<ArrayBuffer>();
     if (dummybuffer.size() < byte_length) dummybuffer.resize(byte_length, 0);
     ab->value_ = JS_NewArrayBufferCopy(isolate->current_context_->context_, dummybuffer.data(), byte_length);
+    
+    BackingStore *bs = new BackingStore;
+    bs->data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &bs->byte_length_, ab->value_);
+    ab->BackingStore_ = std::shared_ptr<BackingStore>(bs);
+
     return Local<ArrayBuffer>(ab);
 }
 
@@ -645,6 +650,11 @@ Local<ArrayBuffer> ArrayBuffer::New(Isolate* isolate, void* data, size_t byte_le
     V8::Check(mode == ArrayBufferCreationMode::kExternalized, "only ArrayBufferCreationMode::kExternalized support!");
     ArrayBuffer *ab = isolate->Alloc<ArrayBuffer>();
     ab->value_ = JS_NewArrayBuffer(isolate->current_context_->context_, (uint8_t*)data, byte_length, nullptr, nullptr, false);
+    
+    BackingStore *bs = new BackingStore;
+    bs->data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &bs->byte_length_, ab->value_);
+    ab->BackingStore_ = std::shared_ptr<BackingStore>(bs);
+
     return Local<ArrayBuffer>(ab);
 }
 
@@ -655,10 +665,7 @@ ArrayBuffer::Contents ArrayBuffer::GetContents() {
 }
 
 std::shared_ptr<BackingStore> ArrayBuffer::GetBackingStore() {
-    BackingStore *ret = new BackingStore;
-    ret->data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &ret->byte_length_, value_);
-    std::shared_ptr<BackingStore> ptr(ret);
-    return ptr;
+    return BackingStore_;
 }
 
 Local<ArrayBuffer> ArrayBufferView::Buffer() {
