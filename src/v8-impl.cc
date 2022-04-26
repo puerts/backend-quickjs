@@ -194,7 +194,6 @@ void Isolate::LowMemoryNotification() {
 
 Local<Value> Isolate::ThrowException(Local<Value> exception) {
     exception_ = exception->value_;
-    this->Escape(*exception);
     return Local<Value>(exception);
 }
 
