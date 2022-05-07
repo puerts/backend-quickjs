@@ -21,12 +21,11 @@ jobs:
         chmod 777 make_osx.sh
         sh ./make_osx.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
-        pwd
-        echo $GITHUB_WORKSPACE
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
-        path: $GITHUB_WORKSPACE/qjs/**/*
+        path: ~/qjs/**/*
         
   build_ios:
     name: iOS
@@ -40,10 +39,11 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod 777 make_ios.sh
         sh ./make_ios.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
-        path: $GITHUB_WORKSPACE/qjs/**/*
+        path: ~/qjs/**/*
 
   build_android:
     name: Android 
@@ -62,10 +62,11 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod 777 make_android.sh
         ./make_android.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
-        path: $GITHUB_WORKSPACE/qjs/**/*
+        path: ~/qjs/**/*
 
   build_window_dll:
     name: Windows
