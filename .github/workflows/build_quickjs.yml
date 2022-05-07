@@ -21,6 +21,8 @@ jobs:
         chmod 777 make_osx.sh
         sh ./make_osx.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
+        pwd
+        echo $GITHUB_WORKSPACE
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
