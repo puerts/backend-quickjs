@@ -54085,7 +54085,7 @@ JSValue JS_NewSet(JSContext *ctx)
     return JS_EXCEPTION;
 }
 
-void JS_SetAdd(JSContext *ctx, JSValueConst this_val,
+JSValue JS_SetAdd(JSContext *ctx, JSValueConst this_val,
                           JSValueConst key)
 {
     JSMapState *s = JS_GetOpaque2(ctx, this_val, JS_CLASS_SET);
