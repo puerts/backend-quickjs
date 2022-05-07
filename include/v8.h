@@ -618,6 +618,23 @@ public:
     }
 };
 
+class V8_EXPORT Set : public Object {
+ public:
+  void Clear();
+  V8_WARN_UNUSED_RESULT MaybeLocal<Set> Add(Local<Context> context,
+                                            Local<Value> key);
+  V8_WARN_UNUSED_RESULT Maybe<bool> Has(Local<Context> context,
+                                        Local<Value> key);
+  V8_WARN_UNUSED_RESULT Maybe<bool> Delete(Local<Context> context,
+                                           Local<Value> key);
+
+  static Local<Set> New(Isolate* isolate);
+
+  V8_INLINE static Set* Cast(Value* obj) {
+    return static_cast<Set*>(obj);
+  }
+};
+
 class V8_EXPORT Map : public Object {
 public:
     void Clear();
@@ -1314,6 +1331,8 @@ public:
 typedef void (*FunctionCallback)(const FunctionCallbackInfo<Value>& info);
 
 class V8_EXPORT FunctionTemplate : public Template {
+private:
+    std::string name_;
 public:
     struct CFunctionData {
         JSValue data_;
@@ -1336,6 +1355,10 @@ public:
     void Inherit(Local<FunctionTemplate> parent);
     
     Local<ObjectTemplate> PrototypeTemplate();
+    
+    void SetClassName(Local<String> name) {
+        name_ = *String::Utf8Value(isolate_, name);
+    }
     
     V8_INLINE static FunctionTemplate* Cast(v8::Data* obj) {
         return static_cast<FunctionTemplate*>(obj);

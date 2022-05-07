@@ -20,7 +20,8 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod 777 make_osx.sh
         sh ./make_osx.sh
-        cp -r include ~/qjs/quickjs/Inc
+        cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
@@ -38,6 +39,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod 777 make_ios.sh
         sh ./make_ios.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin
@@ -60,6 +62,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod 777 make_android.sh
         ./make_android.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
         name: qjs_v8_bin

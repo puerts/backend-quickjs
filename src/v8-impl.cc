@@ -619,6 +619,46 @@ Local<Map> Map::New(Isolate* isolate) {
     return Local<Map>(map);
 }
 
+
+void Set::Clear() {
+    JS_MapClear(Isolate::current_->GetCurrentContext()->context_, value_);
+}
+
+Maybe<bool> Set::Has(Local<Context> context,
+                           Local<Value> key) {
+    JSValue v = JS_SetHas(context->context_, value_, key->value_);
+    if (JS_IsException(v)) {
+        return Maybe<bool>(false);
+    }
+    return Maybe<bool>(JS_ToBool(context->context_, v) == 1);
+}
+
+MaybeLocal<Set> Set::Add(Local<Context> context,
+                         Local<Value> key) {
+    JSValue m = JS_SetAdd(context->context_, value_, key->value_);
+    if (JS_IsException(m)) {
+        return MaybeLocal<Set>();
+    }
+    Set *set = context->GetIsolate()->Alloc<Set>();
+    set->value_ = m;
+    return MaybeLocal<Set>(Local<Set>(set));
+}
+
+Maybe<bool> Set::Delete(Local<Context> context,
+                           Local<Value> key) {
+    JSValue v = JS_SetDelete(context->context_, value_, key->value_);
+    if (JS_IsException(v)) {
+        return Maybe<bool>(false);
+    }
+    return Maybe<bool>(JS_ToBool(context->context_, v) == 1);
+}
+
+Local<Set> Set::New(Isolate* isolate) {
+    Set *set = isolate->Alloc<Set>();
+    set->value_ = JS_NewSet(isolate->GetCurrentContext()->context_);
+    return Local<Set>(set);
+}
+
 static std::vector<uint8_t> dummybuffer;
 
 Local<ArrayBuffer> ArrayBuffer::New(Isolate* isolate, size_t byte_length) {
@@ -974,6 +1014,14 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         return callbackInfo.isConstructCall ? callbackInfo.this_ : callbackInfo.value_;
     }, 0, 0, 4, &func_data[0]);
     
+    JS_DefinePropertyValue( 
+        context->context_, 
+        func, 
+        JS_ATOM_name,
+        JS_AtomToString(context->context_, JS_NewAtom(context->context_, name_.c_str())), 
+        JS_PROP_CONFIGURABLE
+    );
+
     if (cfunction_data_.is_construtor_) {
         JS_SetConstructorBit(context->context_, func, 1);
         JSValue proto = JS_NewObject(context->context_);

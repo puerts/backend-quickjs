@@ -1005,6 +1005,15 @@ JSValue JS_MapDelete(JSContext *ctx, JSValueConst this_val,
                   JSValueConst key);
 
 void JS_MapClear(JSContext *ctx, JSValueConst this_val);
+JSValue JS_NewSet(JSContext *ctx);
+JSValue JS_SetAdd(JSContext *ctx, JSValueConst this_val,
+                  JSValueConst key);
+JSValue JS_SetHas(JSContext *ctx, JSValueConst this_val,
+                  JSValueConst key);
+JSValue JS_SetDelete(JSContext *ctx, JSValueConst this_val,
+                  JSValueConst key);
+
+void JS_SetClear(JSContext *ctx, JSValueConst this_val);
 JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v);
 
 /*-------end fuctions for v8 api---------*/

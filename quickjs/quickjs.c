@@ -54058,6 +54058,101 @@ JSValue JS_MapDelete(JSContext *ctx, JSValueConst this_val,
     return JS_TRUE;
 }
 
+JSValue JS_NewSet(JSContext *ctx)
+{
+    JSMapState *s;
+    JSValue obj;
+
+    obj = js_create_from_ctor(ctx, JS_UNDEFINED, JS_CLASS_SET);
+    if (JS_IsException(obj))
+        return JS_EXCEPTION;
+    s = js_mallocz(ctx, sizeof(*s));
+    if (!s)
+        goto fail;
+    init_list_head(&s->records);
+    s->is_weak = FALSE;
+    JS_SetOpaque(obj, s);
+    s->hash_size = 1;
+    s->hash_table = js_malloc(ctx, sizeof(s->hash_table[0]) * s->hash_size);
+    if (!s->hash_table)
+        goto fail;
+    init_list_head(&s->hash_table[0]);
+    s->record_count_threshold = 4;
+
+    return obj;
+    fail:
+    JS_FreeValue(ctx, obj);
+    return JS_EXCEPTION;
+}
+
+JSValue JS_SetAdd(JSContext *ctx, JSValueConst this_val,
+                          JSValueConst key)
+{
+    JSMapState *s = JS_GetOpaque2(ctx, this_val, JS_CLASS_SET);
+    JSMapRecord *mr;
+
+    if (!s)
+        return JS_EXCEPTION;
+    key = map_normalize_key(ctx, key);
+    if (s->is_weak && !JS_IsObject(key))
+        return JS_ThrowTypeErrorNotAnObject(ctx);
+
+    mr = map_find_record(ctx, s, key);
+    if (mr) {
+        JS_FreeValue(ctx, mr->value);
+    } else {
+        mr = map_add_record(ctx, s, key);
+        if (!mr)
+            return JS_EXCEPTION;
+    }
+    mr->value = JS_TRUE;
+    return JS_DupValue(ctx, this_val);
+}
+
+JSValue JS_SetHas(JSContext *ctx, JSValueConst this_val,
+                          JSValueConst key)
+{
+    JSMapState *s = JS_GetOpaque2(ctx, this_val, JS_CLASS_SET);
+    JSMapRecord *mr;
+
+    if (!s)
+        return JS_EXCEPTION;
+    mr = map_find_record(ctx, s, key);
+    if (!mr)
+        return JS_TRUE;
+    else
+        return JS_FALSE;
+}
+
+void JS_SetClear(JSContext *ctx, JSValueConst this_val)
+{
+    JSMapState *s = JS_GetOpaque2(ctx, this_val, JS_CLASS_SET);
+    struct list_head *el, *el1;
+    JSMapRecord *mr;
+
+    if (!s)
+        return;
+    list_for_each_safe(el, el1, &s->records) {
+        mr = list_entry(el, JSMapRecord, link);
+        map_delete_record(ctx->rt, s, mr);
+    }
+}
+
+JSValue JS_SetDelete(JSContext *ctx, JSValueConst this_val,
+                          JSValueConst key)
+{
+    JSMapState *s = JS_GetOpaque2(ctx, this_val, JS_CLASS_SET);
+    JSMapRecord *mr;
+
+    if (!s)
+        return JS_EXCEPTION;
+    mr = map_find_record(ctx, s, key);
+    if (!mr)
+        return JS_FALSE;
+    map_delete_record(ctx->rt, s, mr);
+    return JS_TRUE;
+}
+
 JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v)
 {
     return JS_DupValue(ctx, JS_MKPTR(JS_TAG_MODULE, v));
