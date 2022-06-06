@@ -601,6 +601,8 @@ public:
 class V8_EXPORT Array : public Object {
 public:
     uint32_t Length() const;
+    
+    static Local<Object> New(Isolate* isolate);
 
     V8_INLINE static Array* Cast(Value* obj) {
         return static_cast<Array*>(obj);
