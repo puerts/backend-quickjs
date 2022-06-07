@@ -184,9 +184,9 @@ public:
         return !IsEmpty();
     }
     
-    V8_INLINE Local<T> Clone(Isolate * isolate) const {
+    V8_INLINE Local<T> Clone(Isolate * isolate, Value *store) const {
         T* ret = static_cast<T*>(AllocValue_(isolate));
-        ret->value_ = val_->value_;
+        ret->value_ = store->value_;
         return Local<T>(ret);
         //return *this;
     }
@@ -206,6 +206,10 @@ public:
     V8_INLINE void SetGlobal(Isolate * isolate, Value *val) {
         SetGlobal_(isolate, val, val_);
         val_ = static_cast<T*>(val);
+    }
+
+    V8_INLINE void SetJSValue(JSValue* val) {
+        val_ = reinterpret_cast<T*>(val);
     }
     
     V8_INLINE Local<T> Escape(EscapableHandleScope* scope) {
@@ -266,6 +270,8 @@ public:
     V8_INLINE void DecRef(Isolate * isolate) { }
     
     V8_INLINE void SetGlobal(Isolate * isolate, Value *val) { }
+
+    V8_INLINE void SetJSValue(JSValue* val) { }
     
     V8_INLINE static Local<T> New(Isolate* isolate, const PersistentBase<T>& that) {
         return that.Get(isolate);
@@ -281,7 +287,7 @@ public:
     
     explicit V8_INLINE Local(Context* that) : LocalSharedPtrImpl(that) {}
     
-    V8_INLINE Local<Context> Clone(Isolate * isolate) const {
+    V8_INLINE Local<Context> Clone(Isolate * isolate, Value *store) const {
         return *this;
     }
 };
@@ -338,7 +344,7 @@ public:
 
     explicit V8_INLINE Local(FunctionTemplate* that) : LocalSharedPtrImpl(that) { }
     
-    V8_INLINE Local<FunctionTemplate> Clone(Isolate * isolate) const {
+    V8_INLINE Local<FunctionTemplate> Clone(Isolate * isolate, Value *store) const {
         return *this;
     }
     
@@ -1014,6 +1020,9 @@ public:
     
     V8_INLINE void Reset() {
         if (!weak_ && val_.SupportWeak()) {
+            if ((void*)*val_ != (void*)&this->store_) {
+                val_.SetJSValue(&this->store_);
+            }
             val_.DecRef(isolate_);
         }
         isolate_ = nullptr;
@@ -1040,7 +1049,7 @@ public:
     JSValue store_;
     
     V8_INLINE Local<T> Get(Isolate* isolate) const {
-        Local<T> ret = val_.Clone(isolate);
+        Local<T> ret = val_.Clone(isolate, (Value*)(&this->store_));
         ret.IncRef(isolate);
         return ret;
     }
@@ -1057,7 +1066,9 @@ public:
 template <class T>
 class Global : public PersistentBase<T> {
 public:
-    V8_INLINE Global() {}
+    V8_INLINE Global() {
+        store_ = JS_Undefined();
+    }
     
     template <class S>
     V8_INLINE Global(Isolate* isolate, Local<S> that) {
