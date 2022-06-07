@@ -186,7 +186,7 @@ public:
     
     V8_INLINE Local<T> Clone(Isolate * isolate, Value *store) const {
         T* ret = static_cast<T*>(AllocValue_(isolate));
-        ret->value_ = store->value_;
+        ret->value_ = static_cast<T*>(store)->value_;
         return Local<T>(ret);
         //return *this;
     }
@@ -1067,7 +1067,6 @@ template <class T>
 class Global : public PersistentBase<T> {
 public:
     V8_INLINE Global() {
-        store_ = JS_Undefined();
     }
     
     template <class S>
