@@ -1047,8 +1047,7 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
     Local<Function> ret(function);
     
     context_to_funtion_[*context] = func;
-    JS_DupValueRT(isolate_->runtime_, func); // for context_to_funtion_
-    JS_DupValueRT(isolate_->runtime_, func); // for ret
+    JS_DupValueRT(isolate_->runtime_, func);
     
     return MaybeLocal<Function>(ret);
 }
