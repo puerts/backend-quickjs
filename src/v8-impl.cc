@@ -111,8 +111,8 @@ Isolate::Isolate(void* external_runtime) : current_context_(nullptr) {
     cls_def.gc_mark = NULL;
     cls_def.call = NULL;
 
-    //大坑，JSClassID是uint32_t，但Object里的class_id类型为uint16_t，JS_NewClass会把class定义放到以uint32_t索引的数组成员
-    //后续如果用这个class_id新建对象，如果class_id大于uint16_t将会被截值，后续释放对象时，会找错class，可能会导致严重后果（不释放，或者调用错误的free）
+    //大坑，JSClassID是uint32_t，但Object里的class_id类型为uint16_t，JS_NewClass会把class定义放到以uint32_t索引的数组成员//////////
+    //后续如果用这个class_id新建对象，如果class_id大于uint16_t将会被截值，后续释放对象时，会找错class，可能会导致严重后果（不释放，或者调用错误的free）//////////
     class_id_ = 0;
     JS_NewClassID(&class_id_);
     JS_NewClass(runtime_, class_id_, &cls_def);
@@ -367,7 +367,7 @@ MaybeLocal<String> Value::ToString(Local<Context> context) const {
     if (JS_IsString(value_)) {
         return MaybeLocal<String>(Local<String>(static_cast<String*>(const_cast<Value*>(this))));
     } else {
-        //由HandleScope跟踪回收
+        //由HandleScope跟踪回收//////////
         String * str = context->GetIsolate()->Alloc<String>();
         str->value_ = JS_ToString(context->context_, value_);
         return MaybeLocal<String>(Local<String>(str));
@@ -439,7 +439,7 @@ static V8_INLINE MaybeLocal<Value> ProcessResult(Isolate *isolate, JSValue ret) 
         isolate->handleException();
         return MaybeLocal<Value>();
     } else {
-        //脚本执行的返回值由HandleScope接管，这可能有需要GC的对象
+        //脚本执行的返回值由HandleScope接管，这可能有需要GC的对象//////////
         val = isolate->Alloc<Value>();
         val->value_ = ret;
         return MaybeLocal<Value>(Local<Value>(val));
@@ -985,7 +985,7 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         callbackInfo.this_ = this_val;
         callbackInfo.data_ = func_data[2];
         callbackInfo.value_ = JS_Undefined();
-        //JS_IsConstructor(ctx, this_val)，静态方法的话，用JS_IsConstructor会返回true，其父节点对象是构造函数，这个就是构造函数？
+        //JS_IsConstructor(ctx, this_val)，静态方法的话，用JS_IsConstructor会返回true，其父节点对象是构造函数，这个就是构造函数？//////////
         callbackInfo.isConstructCall = JS_ToBool(ctx, func_data[3]);
         
         if (callbackInfo.isConstructCall && internal_field_count > 0) {
