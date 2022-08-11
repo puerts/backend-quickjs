@@ -927,13 +927,13 @@ private:
     void SetWeakPtrToOpaque(std::shared_ptr<Context> sptr);
 
 public:
-    static Local<Context> New(Isolate* isolate) {
+    V8_INLINE static Local<Context> New(Isolate* isolate) {
         auto ret = Local<Context>(new Context(isolate));
         ret->SetWeakPtrToOpaque(ret.val_);
         return ret;
     }
     
-    static Local<Context> New(Isolate* isolate, void* external_context) {
+    V8_INLINE static Local<Context> New(Isolate* isolate, void* external_context) {
         auto ret =  Local<Context>(new Context(isolate, external_context));
         ret->SetWeakPtrToOpaque(ret.val_);
         return ret;
