@@ -199,6 +199,9 @@ public:
     }
     
     V8_INLINE void * GetUserData(Isolate * isolate) {
+        if (isolate == nullptr) {
+            return nullptr;
+        }
         return GetUserData_(isolate, val_->value_);
     }
     
@@ -1037,6 +1040,9 @@ public:
             val_.DecRef(isolate_);
         }
         if (weak_) {
+            if ((void*)*val_ != (void*)&this->store_) {
+                val_.SetJSValue(&this->store_);
+            }
             ObjectUserData* object_udata = reinterpret_cast<ObjectUserData*>(val_.GetUserData(isolate_));
             if (object_udata) {
                 object_udata->callback_ = nullptr;
