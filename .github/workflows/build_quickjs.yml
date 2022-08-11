@@ -184,4 +184,40 @@ jobs:
       with:
         name: qjs_v8_bin
         path: qjs/**/*
-
+ 
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.tag_date != '' }}
+    needs: [build_android,build_window_dll,build_window_dll32,build_macos,build_ios]
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: qjs_v8_bin
+          path: qjs_v8_bin/
+          
+      - name: Create Release Asset
+        run: |
+          cd qjs_v8_bin/ && tar cvfz ../qjs_v8_bin.tgz quickjs && cd -
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: QJS_${{ github.event.inputs.tag_date }}
+          release_name: QJS_${{ github.event.inputs.tag_date }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload V8
+        #id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./qjs_v8_bin.tgz
+          asset_name: qjs_v8_bin.tgz
+          asset_content_type: application/tgz
+          
