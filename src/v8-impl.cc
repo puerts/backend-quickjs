@@ -11,6 +11,15 @@ enum
     JS_ATOM_END,
 };
 
+#ifndef PUERTS_IS_ARRAYBUFFER
+    #define PUERTS_IS_ARRAYBUFFER JS_IsArrayBuffer
+#endif
+#ifndef PUERTS_GET_CONTEXT_OPAQUE
+    #define PUERTS_GET_CONTEXT_OPAQUE JS_GetContextOpaque
+#endif
+#ifndef PUERTS_SET_CONTEXT_OPAQUE
+    #define PUERTS_SET_CONTEXT_OPAQUE JS_SetContextOpaque
+#endif
 
 #if !defined(CONFIG_CHECK_JSVALUE) && defined(JS_NAN_BOXING)
 #define JS_INITVAL(s, t, val) s = JS_MKVAL(t, val)
@@ -282,7 +291,7 @@ bool Value::IsDate() const {
 }
 
 bool Value::IsArrayBuffer() const {
-    return JS_IsArrayBuffer(value_);
+    return PUERTS_IS_ARRAYBUFFER(value_);
 }
 
 bool Value::IsArrayBufferView() const {
@@ -735,6 +744,10 @@ Context::~Context() {
     if (!is_external_context_) {
         JS_FreeContext(context_);
     }
+}
+
+void Context::SetWeakPtrToOpaque(std::shared_ptr<Context> sptr) {
+    PUERTS_SET_CONTEXT_OPAQUE(context_, new std::weak_ptr<Context>(sptr));
 }
 
 MaybeLocal<Value> Function::Call(Local<Context> context,

@@ -19,10 +19,8 @@
 #include "libplatform/libplatform.h"
 
 #include "v8config.h"     // NOLINT(build/include_directory)
-
-#define PUERTS_QUICKJS "quickjs-msvc.h"
-#define PUERTS_GET_CONTEXT_OPAQUE JS_GetContextOpaque
-#include PUERTS_QUICKJS
+ 
+#include "quickjs-msvc.h"
 
 #define JS_TAG_EXTERNAL (JS_TAG_FLOAT64 + 1)
 
@@ -803,8 +801,22 @@ public:
         return new Isolate();
     }
     
-    V8_INLINE static Isolate* New(void* external_context) {
-        return new Isolate(external_context);
+    V8_INLINE static Isolate* New(void* external_runtime) {
+        return new Isolate(external_runtime);
+    }
+    
+    V8_INLINE static Isolate* New(void* external_runtime, void* external_context) {
+        if (external_context != nullptr) {
+            return new Isolate(JS_GetRuntime((JSContext *)external_context));
+        } 
+        else if (external_runtime != nullptr)
+        {
+            return new Isolate(external_runtime);
+        }
+        else
+        {
+            return new Isolate();
+        }
     }
 
     V8_INLINE void Dispose() {
@@ -911,21 +923,20 @@ V8_INLINE Local<Boolean> False(Isolate* isolate) {
 }
 
 class V8_EXPORT Context : Data {
+private: 
+    void SetWeakPtrToOpaque(std::shared_ptr<Context> sptr);
+
 public:
-    V8_INLINE static Local<Context> New(Isolate* isolate) {
+    static Local<Context> New(Isolate* isolate) {
         auto ret = Local<Context>(new Context(isolate));
         ret->SetWeakPtrToOpaque(ret.val_);
         return ret;
     }
     
-    V8_INLINE static Local<Context> New(Isolate* isolate, void* external_context) {
+    static Local<Context> New(Isolate* isolate, void* external_context) {
         auto ret =  Local<Context>(new Context(isolate, external_context));
         ret->SetWeakPtrToOpaque(ret.val_);
         return ret;
-    }
-    
-    V8_INLINE void SetWeakPtrToOpaque(std::shared_ptr<Context> sptr) {
-        JS_SetContextOpaque(context_, new std::weak_ptr<Context>(sptr));
     }
 
     Local<Object> Global();
