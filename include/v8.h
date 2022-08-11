@@ -19,7 +19,10 @@
 #include "libplatform/libplatform.h"
 
 #include "v8config.h"     // NOLINT(build/include_directory)
-#include "quickjs-msvc.h"
+
+#define PUERTS_QUICKJS "quickjs-msvc.h"
+#define PUERTS_GET_CONTEXT_OPAQUE JS_GetContextOpaque
+#include PUERTS_QUICKJS
 
 #define JS_TAG_EXTERNAL (JS_TAG_FLOAT64 + 1)
 
@@ -907,11 +910,19 @@ V8_INLINE Local<Boolean> False(Isolate* isolate) {
 class V8_EXPORT Context : Data {
 public:
     V8_INLINE static Local<Context> New(Isolate* isolate) {
-        return Local<Context>(new Context(isolate));
+        auto ret = Local<Context>(new Context(isolate));
+        ret->SetWeakPtrToOpaque(ret.val_);
+        return ret;
     }
     
     V8_INLINE static Local<Context> New(Isolate* isolate, void* external_context) {
-        return Local<Context>(new Context(isolate, external_context));
+        auto ret =  Local<Context>(new Context(isolate, external_context));
+        ret->SetWeakPtrToOpaque(ret.val_);
+        return ret;
+    }
+    
+    V8_INLINE void SetWeakPtrToOpaque(std::shared_ptr<Context> sptr) {
+        JS_SetContextOpaque(context_, new std::weak_ptr<Context>(sptr));
     }
 
     Local<Object> Global();
@@ -1024,6 +1035,13 @@ public:
                 val_.SetJSValue(&this->store_);
             }
             val_.DecRef(isolate_);
+        }
+        if (weak_) {
+            ObjectUserData* object_udata = reinterpret_cast<ObjectUserData*>(val_.GetUserData(isolate_));
+            if (object_udata) {
+                object_udata->callback_ = nullptr;
+                object_udata->parameter_ = nullptr;
+            }
         }
         isolate_ = nullptr;
         val_ = Local<T>();
