@@ -24,6 +24,23 @@ jobs:
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
+
+  build_macos_arm64:
+    name: macOS
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod 777 make_osx_arm64.sh
+        sh ./make_osx_arm64.sh
+        cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
         
   build_ios:
     name: iOS
