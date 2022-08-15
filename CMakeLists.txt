@@ -4,6 +4,12 @@ project(quickjs)
 
 if (APPLE AND NOT IOS)
    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
+   
+   if ( NOT DEFINED FOR_SILICON )
+       set(CMAKE_OSX_ARCHITECTURES x86_64)
+   else ()
+       set(CMAKE_OSX_ARCHITECTURES arm64)
+   endif ()
 endif()
 
 set(qjs_cflags -Wall)
@@ -59,7 +65,7 @@ else()
         _GNU_SOURCE
         CONFIG_BIGNUM
         CONFIG_VERSION="${QJS_VERSION_STR}"
-        )
+    )
 endif()
 
 #set_target_properties(quickjs PROPERTIES
