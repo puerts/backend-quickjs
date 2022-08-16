@@ -35,7 +35,7 @@ set(SRC_FILES
         quickjs/libunicode.c
         quickjs/quickjs.c
         )
-if ( ANDROID OR APPLE OR (MSYS AND NOT WIN_DLL) )
+if ( NOT MSYS OR NOT WIN_DLL )
     list(APPEND SRC_FILES src/v8-impl.cc)
 endif()
 

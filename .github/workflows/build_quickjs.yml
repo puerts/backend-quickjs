@@ -16,7 +16,7 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
-        chmod 777 make_osx.sh
+        chmod +x make_osx.sh
         sh ./make_osx.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r $GITHUB_WORKSPACE/qjs ~/
@@ -33,7 +33,7 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
-        chmod 777 make_osx_arm64.sh
+        chmod +x make_osx_arm64.sh
         sh ./make_osx_arm64.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r $GITHUB_WORKSPACE/qjs ~/
@@ -50,7 +50,7 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
-        chmod 777 make_ios.sh
+        chmod +x make_ios.sh
         sh ./make_ios.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
@@ -72,8 +72,24 @@ jobs:
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
-        chmod 777 make_android.sh
+        chmod +x make_android.sh
         ANDROID_NDK=~/android-ndk-r21b ./make_android.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
+        
+  build_linux:
+    name: Linux 
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x make_linux64.sh
+        ./make_linux64.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v2
       with:
@@ -200,7 +216,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_macos,build_ios]
+    needs: [build_android,build_window_dll,build_window_dll32,build_macos,build_ios,build_linux]
     steps:
       - uses: actions/download-artifact@v1
         with:
