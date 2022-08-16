@@ -216,7 +216,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_macos,build_ios,build_linux]
+    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_macos,build_macos_arm64,build_ios,build_linux]
     steps:
       - uses: actions/download-artifact@v1
         with:
