@@ -221,7 +221,7 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: qjs_v8_bin
-          path: $GITHUB_WORKSPACE
+          path: qjs_v8_bin/
           
       - name: Create Release Asset
         run: |
