@@ -140,7 +140,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Insatll MSVC
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1
     - uses: msys2/setup-msys2@v2
       with:
         update: true
