@@ -1,7 +1,7 @@
 {
     "definition": ["WITH_QUICKJS", "WITHOUT_INSPECTOR"],
     "include": ["/Inc"],
-    "link": {
+    "link-libraries": {
         "win": {
             "ia32": ["/Lib/Win32/quickjs.dll.lib"],
             "x64": ["/Lib/Win64/quickjs.dll.lib"]
@@ -19,7 +19,7 @@
             "x64": ["/Lib/Linux/libquickjs.a"]
         }
     },
-    "copy": {
+    "copy-libraries": {
         "win": {
             "ia32": ["/Lib/Win32/*.dll"],
             "x64": ["/Lib/Win64/*.dll"]
