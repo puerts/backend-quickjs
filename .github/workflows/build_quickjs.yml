@@ -111,7 +111,7 @@ jobs:
         echo "#! /bin/sh" > /mingw64/bin/make
         echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
         wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -154,7 +154,7 @@ jobs:
         echo "#! /bin/sh" > /mingw64/bin/make
         echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
         wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -195,7 +195,7 @@ jobs:
         echo "#! /bin/sh" > /mingw32/bin/make
         echo "\"mingw32-make\" \"\$@\"" >> /mingw32/bin/make
         wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
