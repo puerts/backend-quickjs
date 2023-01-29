@@ -173,6 +173,7 @@ jobs:
         mkdir -p qjs/quickjs/Lib/Win64MD/
         cp win/quickjs.dll.lib qjs/quickjs/Lib/Win64MD/
         cp build/msys-quickjs.dll qjs/quickjs/Lib/Win64MD/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64MD/
     - uses: actions/upload-artifact@v3
@@ -214,6 +215,7 @@ jobs:
         mkdir -p qjs/quickjs/Lib/Win32/
         cp win/quickjs.dll.lib qjs/quickjs/Lib/Win32/
         cp build/msys-quickjs.dll qjs/quickjs/Lib/Win32/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libgcc_s_dw2-1.dll qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win32/
     - uses: actions/upload-artifact@v3
