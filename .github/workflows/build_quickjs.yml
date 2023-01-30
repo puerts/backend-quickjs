@@ -121,13 +121,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: 'mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw64/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
-        wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -164,13 +158,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: 'mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw64/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
-        wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -207,13 +195,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: 'mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw64/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
-        wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -250,13 +232,7 @@ jobs:
       with:
         msystem: MINGW32
         update: true
-        install: 'mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw32/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw32/bin/make
-        wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
-        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+        install: 'cmake make mingw-w64-i686-gcc mingw-w64-i686-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
