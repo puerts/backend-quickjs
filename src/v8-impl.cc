@@ -138,6 +138,14 @@ Isolate::~Isolate() {
     }
 };
 
+Isolate* Isolate::GetCurrent() {
+    return current_;
+}
+
+void Isolate::SetCurrent(Isolate* i) {
+    current_ = i;
+}
+
 Value* Isolate::Alloc_() {
     if (value_alloc_pos_ == (int)values_.size()) {
         JSValue* node = new JSValue;
@@ -736,6 +744,18 @@ Context::Context(Isolate* isolate, void* external_context) :isolate_(isolate) {
     context_ = is_external_context_ ? ((JSContext *)external_context) : JS_NewContext(isolate->runtime_);
     // JS_SetContextOpaque(context_, this);
     global_ = JS_GetGlobalObject(context_);
+}
+
+Local<Context> Context::New(Isolate* isolate) {
+    auto ret = Local<Context>(new Context(isolate));
+    ret->SetWeakPtrToOpaque(ret.val_);
+    return ret;
+}
+
+Local<Context> Context::New(Isolate* isolate, void* external_context) {
+    auto ret =  Local<Context>(new Context(isolate, external_context));
+    ret->SetWeakPtrToOpaque(ret.val_);
+    return ret;
 }
 
 Context::~Context() {

@@ -180,6 +180,50 @@ jobs:
       with:
         name: qjs_v8_bin
         path: qjs/**/*
+        
+  build_window_dll_md_dll:
+    name: Windows MD_dll
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+    - name: Insatll MSVC
+      uses: microsoft/setup-msbuild@v1.1
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: 'mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
+    - shell: msys2 {0}
+      run: |
+        echo "#! /bin/sh" > /mingw64/bin/make
+        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
+        wget https://repo.msys2.org/msys/x86_64/cmake-3.23.2-1-x86_64.pkg.tar.zst
+        pacman --noconfirm -U cmake-3.23.2-1-x86_64.pkg.tar.zst
+    - shell: msys2 {0}
+      run: |
+        sh ./make_win.sh
+    - name: Build
+      run: |
+        cd win
+        .\make_win64md_dll.bat
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Merge Libs
+      run: |
+        cd win
+        LIB.EXE /OUT:quickjs.dll.lib ..\build\libquickjs.dll.a build\Release\v8qjs.lib
+    - name: Prepare
+      shell: msys2 {0}
+      run: |
+        mkdir -p qjs/quickjs/Lib/Win64DLL/
+        cp win/quickjs.dll.lib qjs/quickjs/Lib/Win64DLL/
+        cp win/build/Release/v8qjs.dll qjs/quickjs/Lib/Win64DLL/
+        cp build/msys-quickjs.dll qjs/quickjs/Lib/Win64DLL/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64DLL/
+        cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64DLL/
+        cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64DLL/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: qjs/**/*
 
   build_window_dll32:
     name: Windows32
@@ -226,7 +270,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_macos,build_macos_arm64,build_ios,build_linux]
+    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_arm64,build_ios,build_linux]
     steps:
       - uses: actions/download-artifact@v1
         with:
