@@ -26,6 +26,22 @@ jobs:
         name: qjs_v8_bin
         path: ~/qjs/**/*
 
+  build_macos_dll:
+    name: macOS
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x make_osx_dylib.sh
+        sh ./make_osx_dylib.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
+
   build_macos_arm64:
     name: macOS_arm64
     runs-on: macos-11
@@ -270,7 +286,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_arm64,build_ios,build_linux]
+    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux]
     steps:
       - uses: actions/download-artifact@v1
         with:
