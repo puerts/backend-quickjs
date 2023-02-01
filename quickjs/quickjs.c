@@ -54166,7 +54166,7 @@ JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v)
     return js_get_module_ns(ctx, v);
 }
 
-static bool JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
+static int JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
 {
     struct list_head *el;
     JSModuleDef *m;
@@ -54180,8 +54180,8 @@ static bool JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
         {
             el->prev->next = el->next;
             js_free_module_def(ctx, m);
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }
