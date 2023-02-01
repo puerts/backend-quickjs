@@ -1018,6 +1018,7 @@ JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v);
 
 /*-------end fuctions for v8 api---------*/
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v);
+int JS_ReleaseLoadedModule(JSContext *ctx, const char* path);
 
 #undef js_unlikely
 #undef js_force_inline
