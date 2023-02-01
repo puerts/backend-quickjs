@@ -54178,7 +54178,7 @@ static bool JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
         m = list_entry(el, JSModuleDef, link);
         if (m->module_name == name) 
         {
-            m->prev->next = m->next;
+            el->prev->next = el->next;
             js_free_module_def(ctx, m);
             return true;
         }
