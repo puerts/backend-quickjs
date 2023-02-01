@@ -54180,8 +54180,10 @@ int JS_ReleaseLoadedModule(JSContext *ctx, const char* path)
         {
             el->prev->next = el->next;
             js_free_module_def(ctx, m);
+            JS_FreeAtom(ctx, name);
             return 1;
         }
     }
+    JS_FreeAtom(ctx, name);
     return 0;
 }
