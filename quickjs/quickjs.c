@@ -54166,7 +54166,7 @@ JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v)
     return js_get_module_ns(ctx, v);
 }
 
-static int JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
+int JS_ReleaseLoadedModule(JSContext *ctx, const char* path)
 {
     struct list_head *el;
     JSModuleDef *m;
