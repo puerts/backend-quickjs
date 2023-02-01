@@ -27221,6 +27221,7 @@ static JSModuleDef *js_find_loaded_module(JSContext *ctx, JSAtom name)
     /* first look at the loaded modules */
     list_for_each(el, &ctx->loaded_modules) {
         m = list_entry(el, JSModuleDef, link);
+        
         if (m->module_name == name)
             return m;
     }
@@ -54163,4 +54164,24 @@ JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v)
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v)
 {
     return js_get_module_ns(ctx, v);
+}
+
+static bool JS_RELEASE_LOADED_MODULE(JSContext *ctx, const char* path)
+{
+    struct list_head *el;
+    JSModuleDef *m;
+    JSAtom name = __JS_NewAtomInit(JS_GetRuntime(ctx), path, strlen(path), JS_ATOM_TYPE_STRING);
+    
+    /* first look at the loaded modules */
+    list_for_each(el, &ctx->loaded_modules) 
+    {
+        m = list_entry(el, JSModuleDef, link);
+        if (m->module_name == name) 
+        {
+            m->prev->next = m->next;
+            js_free_module_def(ctx, m);
+            return true;
+        }
+    }
+    return false;
 }
