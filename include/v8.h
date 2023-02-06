@@ -772,6 +772,9 @@ class V8_EXPORT Isolate {
 public:
     static Isolate* current_;
     
+    static Isolate* GetCurrent();
+    static void SetCurrent(Isolate* i);
+    
     struct CreateParams {
         CreateParams()
             : array_buffer_allocator(nullptr) {}
@@ -781,12 +784,12 @@ public:
     class V8_EXPORT Scope {
     public:
         explicit V8_INLINE Scope(Isolate* isolate) {
-            prev_isolate_ = current_;
-            current_ = isolate;
+            prev_isolate_ = GetCurrent();
+            SetCurrent(isolate);
         }
 
         V8_INLINE ~Scope() {
-            current_ = prev_isolate_;
+            SetCurrent(prev_isolate_);
         }
 
         // Prevent copying of Scope objects.
@@ -927,17 +930,9 @@ private:
     void SetWeakPtrToOpaque(std::shared_ptr<Context> sptr);
 
 public:
-    V8_INLINE static Local<Context> New(Isolate* isolate) {
-        auto ret = Local<Context>(new Context(isolate));
-        ret->SetWeakPtrToOpaque(ret.val_);
-        return ret;
-    }
+    static Local<Context> New(Isolate* isolate);
     
-    V8_INLINE static Local<Context> New(Isolate* isolate, void* external_context) {
-        auto ret =  Local<Context>(new Context(isolate, external_context));
-        ret->SetWeakPtrToOpaque(ret.val_);
-        return ret;
-    }
+    static Local<Context> New(Isolate* isolate, void* external_context);
 
     Local<Object> Global();
 
@@ -1012,7 +1007,7 @@ class WeakCallbackInfo {
 public:
     typedef void (*Callback)(const WeakCallbackInfo<T>& data);
     
-    V8_INLINE Isolate* GetIsolate() const { return Isolate::current_;}
+    V8_INLINE Isolate* GetIsolate() const { return Isolate::GetCurrent();}
     
     V8_INLINE T* GetParameter() const { return reinterpret_cast<T*>(object_udata_.parameter_); }
     
@@ -1630,7 +1625,7 @@ private:
 class V8_EXPORT Message : Data {
 public:
     V8_INLINE Local<Value> GetScriptResourceName() const {
-        return String::NewFromUtf8(Isolate::current_, resource_name_.data(), NewStringType::kNormal, resource_name_.length()).ToLocalChecked();
+        return String::NewFromUtf8(Isolate::GetCurrent(), resource_name_.data(), NewStringType::kNormal, resource_name_.length()).ToLocalChecked();
     }
     
     //TODO: quickjs未提供该信息?

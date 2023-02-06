@@ -60,7 +60,11 @@ if ( MSYS )
         CONFIG_VERSION="\\\"${QJS_VERSION_STR}\\\""
         )
 else()
-    add_library(quickjs STATIC ${SRC_FILES})
+    if ( BUILD_SHARED )
+        add_library(quickjs SHARED ${SRC_FILES})
+    else ()
+        add_library(quickjs STATIC ${SRC_FILES})
+    endif()
     target_compile_definitions(quickjs PRIVATE
         _GNU_SOURCE
         CONFIG_BIGNUM

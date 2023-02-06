@@ -12,24 +12,41 @@ jobs:
     name: macOS
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
         chmod +x make_osx.sh
         sh ./make_osx.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
+        cp -r puer-build.json $GITHUB_WORKSPACE/qjs/quickjs/
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
+
+  build_macos_dll:
+    name: macOS
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x make_osx_dylib.sh
+        sh ./make_osx_dylib.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
 
   build_macos_arm64:
-    name: macOS
+    name: macOS_arm64
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
@@ -37,7 +54,7 @@ jobs:
         sh ./make_osx_arm64.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
@@ -46,14 +63,14 @@ jobs:
     name: iOS
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
         chmod +x make_ios.sh
         sh ./make_ios.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
@@ -62,7 +79,7 @@ jobs:
     name: Android 
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install NDK
       run: |
         cd ~
@@ -75,7 +92,7 @@ jobs:
         chmod +x make_android.sh
         ANDROID_NDK=~/android-ndk-r21b ./make_android.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
@@ -84,14 +101,14 @@ jobs:
     name: Linux 
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run build script
       run: |
         cd $GITHUB_WORKSPACE
         chmod +x make_linux64.sh
         ./make_linux64.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
@@ -100,15 +117,11 @@ jobs:
     name: Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: 'cmake mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw64/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -127,9 +140,10 @@ jobs:
         mkdir -p qjs/quickjs/Lib/Win64/
         cp win/quickjs.dll.lib qjs/quickjs/Lib/Win64/
         cp build/msys-quickjs.dll qjs/quickjs/Lib/Win64/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: qjs/**/*
@@ -138,17 +152,13 @@ jobs:
     name: Windows MD
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Insatll MSVC
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: 'cmake mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw64/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw64/bin/make
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -167,9 +177,48 @@ jobs:
         mkdir -p qjs/quickjs/Lib/Win64MD/
         cp win/quickjs.dll.lib qjs/quickjs/Lib/Win64MD/
         cp build/msys-quickjs.dll qjs/quickjs/Lib/Win64MD/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64MD/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: qjs/**/*
+        
+  build_window_dll_md_dll:
+    name: Windows MD_dll
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+    - name: Insatll MSVC
+      uses: microsoft/setup-msbuild@v1.1
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: 'cmake make mingw-w64-x86_64-gcc mingw-w64-x86_64-dlfcn'
+    - shell: msys2 {0}
+      run: |
+        sh ./make_win.sh
+    - name: Build
+      run: |
+        cd win
+        .\make_win64md_dll.bat
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Merge Libs
+      run: |
+        cd win
+        LIB.EXE /OUT:quickjs.dll.lib ..\build\libquickjs.dll.a build\Release\v8qjs.lib
+    - name: Prepare
+      shell: msys2 {0}
+      run: |
+        mkdir -p qjs/quickjs/Lib/Win64DLL/
+        cp win/quickjs.dll.lib qjs/quickjs/Lib/Win64DLL/
+        cp win/build/Release/v8qjs.dll qjs/quickjs/Lib/Win64DLL/
+        cp build/msys-quickjs.dll qjs/quickjs/Lib/Win64DLL/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64DLL/
+        cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64DLL/
+        cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64DLL/
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: qjs/**/*
@@ -178,16 +227,12 @@ jobs:
     name: Windows32
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW32
         update: true
-        install: 'cmake mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-dlfcn'
-    - shell: msys2 {0}
-      run: |
-        echo "#! /bin/sh" > /mingw32/bin/make
-        echo "\"mingw32-make\" \"\$@\"" >> /mingw32/bin/make
+        install: 'cmake make mingw-w64-i686-gcc mingw-w64-i686-dlfcn'
     - shell: msys2 {0}
       run: |
         sh ./make_win.sh
@@ -206,9 +251,10 @@ jobs:
         mkdir -p qjs/quickjs/Lib/Win32/
         cp win/quickjs.dll.lib qjs/quickjs/Lib/Win32/
         cp build/msys-quickjs.dll qjs/quickjs/Lib/Win32/
+        cp build/libquickjs.dll.a qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libgcc_s_dw2-1.dll qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win32/
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: qjs_v8_bin
         path: qjs/**/*
@@ -216,7 +262,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_macos,build_macos_arm64,build_ios,build_linux]
+    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux]
     steps:
       - uses: actions/download-artifact@v1
         with:
@@ -237,9 +283,8 @@ jobs:
           release_name: QJS_${{ github.event.inputs.tag_date }}
           draft: false
           prerelease: false
-          
+
       - name: Upload V8
-        #id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -248,4 +293,3 @@ jobs:
           asset_path: ./qjs_v8_bin.tgz
           asset_name: qjs_v8_bin.tgz
           asset_content_type: application/tgz
-          
