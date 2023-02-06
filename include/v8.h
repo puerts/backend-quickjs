@@ -1065,6 +1065,12 @@ public:
         weak_ = false;
     }
     
+    V8_INLINE void Empty() {
+        isolate_ = nullptr;
+        val_ = Local<T>();
+        weak_ = false;
+    }
+    
     template <class S>
     V8_INLINE void Reset(Isolate* isolate, const Local<S>& other) {
         static_assert(std::is_base_of<T, S>::value, "type check");
