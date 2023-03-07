@@ -20,12 +20,14 @@ if(CMAKE_C_COMPILER_ID MATCHES "AppleClang|Clang")
             -Wno-missing-field-initializers
             -Wno-unused-parameter
             -Wno-unused-variable
-            -funsigned-char)
+            -funsigned-char
+            -fPIC)
 else()
     list(APPEND qjs_cflags
             -Wno-array-bounds
             -Wno-unused-variable
-            -Wno-unused-but-set-variable)
+            -Wno-unused-but-set-variable
+            -fPIC)
 endif()
 
 set(SRC_FILES
