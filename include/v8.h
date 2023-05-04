@@ -864,16 +864,20 @@ public:
     
     HandleScope *currentHandleScope = nullptr;
     
-    void *embedder_data_ = nullptr;
+    std::vector<void*> embedder_data_;
     
     V8_INLINE void* GetData(uint32_t slot) {
-        V8::Check(slot == 0, "not supported yet");
-        return embedder_data_;
+        if (embedder_data_.size() > slot) return embedder_data_[slot];
+        else return nullptr;
     }
         
     V8_INLINE void SetData(uint32_t slot, void* data) {
-        V8::Check(slot == 0, "not supported yet");
-        embedder_data_ = data;
+        if (embedder_data_.size() > slot) embedder_data_[slot] = data;
+        else {
+            for (int i = embedder_data_.size(); i <= slot; i++) {
+                embedder_data_.push_back(i == slot ? data : nullptr);
+            }
+        }
     }
     
     template<class F> F* Alloc() {
