@@ -1378,6 +1378,10 @@ public:
     };
     
     std::map<std::string, AccessorInfo> accessor_infos_;
+    
+    MaybeLocal<Object> NewInstance(Local<Context> context);
+    
+    JSValue constructor_;
 };
 
 typedef void (*FunctionCallback)(const FunctionCallbackInfo<Value>& info);

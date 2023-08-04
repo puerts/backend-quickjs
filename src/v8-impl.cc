@@ -972,6 +972,16 @@ void ObjectTemplate::SetInternalFieldCount(int value) {
     internal_field_count_ = value;
 }
 
+MaybeLocal<Object> ObjectTemplate::NewInstance(Local<Context> context)
+{
+    Object* obj = context->GetIsolate()->Alloc<Object>();
+    JSValue proto = JS_GetProperty(context->context_, constructor_, JS_ATOM_prototype);
+    obj->value_ = JS_NewObjectProtoClass(context->context_, proto, context->GetIsolate()->class_id_);
+    JS_FreeValue(context->context_, proto);
+    Local<Object> ret(obj);
+    return MaybeLocal<Object>(ret);
+}
+
 Local<FunctionTemplate> FunctionTemplate::New(Isolate* isolate, FunctionCallback callback,
                                               Local<Value> data) {
     Local<FunctionTemplate> functionTemplate(new FunctionTemplate());
@@ -990,6 +1000,7 @@ Local<FunctionTemplate> FunctionTemplate::New(Isolate* isolate, FunctionCallback
 Local<ObjectTemplate> FunctionTemplate::InstanceTemplate() {
     if (instance_template_.IsEmpty()) {
         instance_template_ = Local<ObjectTemplate>(new ObjectTemplate());
+        instance_template_->constructor_ = GetFunction(context).ToLocalChecked()->value_;
     }
     return instance_template_;
 }
