@@ -1381,7 +1381,7 @@ public:
     
     MaybeLocal<Object> NewInstance(Local<Context> context);
     
-    class FunctionTemplate* constructor_template_;
+    class FunctionTemplate* constructor_template_ = nullptr;
 };
 
 typedef void (*FunctionCallback)(const FunctionCallbackInfo<Value>& info);
