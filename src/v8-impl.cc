@@ -980,6 +980,11 @@ MaybeLocal<Object> ObjectTemplate::NewInstance(Local<Context> context)
         JSValue proto = JS_GetProperty(context->context_, func, JS_ATOM_prototype);
         obj->value_ = JS_NewObjectProtoClass(context->context_, proto, context->GetIsolate()->class_id_);
         JS_FreeValue(context->context_, proto);
+        size_t size = sizeof(ObjectUserData) + sizeof(void*) * (internal_field_count_ - 1);
+        ObjectUserData* object_udata = (ObjectUserData*)js_malloc(context->context_, size);
+        memset(object_udata, 0, size);
+        object_udata->len_ = internal_field_count_;
+        JS_SetOpaque(obj->value_, object_udata);
     } else {
         obj->value_ = JS_NewObject(context->context_);
     }
