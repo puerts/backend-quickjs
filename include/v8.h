@@ -874,7 +874,7 @@ public:
     V8_INLINE void SetData(uint32_t slot, void* data) {
         if (embedder_data_.size() > slot) embedder_data_[slot] = data;
         else {
-            for (int i = embedder_data_.size(); i <= slot; i++) {
+            for (auto i = embedder_data_.size(); i <= slot; i++) {
                 embedder_data_.push_back(i == slot ? data : nullptr);
             }
         }
