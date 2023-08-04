@@ -1381,7 +1381,7 @@ public:
     
     MaybeLocal<Object> NewInstance(Local<Context> context);
     
-    JSValue constructor_;
+    class FunctionTemplate* constructor_template_;
 };
 
 typedef void (*FunctionCallback)(const FunctionCallbackInfo<Value>& info);
