@@ -1289,9 +1289,9 @@ Local<Object> Object::New(Isolate* isolate) {
 }
 
 Local<Array> Array::New(Isolate* isolate) {
-    Object *object = isolate->Alloc<Object>();
+    Array *object = isolate->Alloc<Array>();
     object->value_ = JS_NewArray(isolate->GetCurrentContext()->context_);
-    return Local<Object>(object);
+    return Local<Array>(object);
 }
 
 uint32_t Array::Length() const {
