@@ -1288,7 +1288,7 @@ Local<Object> Object::New(Isolate* isolate) {
     return Local<Object>(object);
 }
 
-Local<Object> Array::New(Isolate* isolate) {
+Local<Array> Array::New(Isolate* isolate) {
     Object *object = isolate->Alloc<Object>();
     object->value_ = JS_NewArray(isolate->GetCurrentContext()->context_);
     return Local<Object>(object);
