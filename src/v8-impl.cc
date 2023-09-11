@@ -455,8 +455,7 @@ MaybeLocal<Script> Script::Compile(
 static V8_INLINE MaybeLocal<Value> ProcessResult(Isolate *isolate, JSValue ret) {
     Value* val = nullptr;
     if (JS_IsException(ret)) {
-        //isolate->handleException();
-        isolate->exception_ = JS_GetException(isolate->current_context_->context_);
+        isolate->handleException();
         return MaybeLocal<Value>();
     } else {
         //脚本执行的返回值由HandleScope接管，这可能有需要GC的对象//////////
