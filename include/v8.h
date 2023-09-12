@@ -259,7 +259,7 @@ public:
     
     template <class S> V8_INLINE static Local<T> Cast(Local<S> that) {
         Local<T> result;
-        result.val_ = std::dynamic_pointer_cast<T>(that.val_);
+        result.val_ = std::static_pointer_cast<T>(that.val_);
         return result;
     }
 
