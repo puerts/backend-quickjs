@@ -1671,8 +1671,6 @@ public:
     
     Local<v8::Message> Message() const;
     
-    void handleException();
-    
     JSValue catched_;
     
     Isolate* isolate_;
