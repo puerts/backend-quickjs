@@ -62,11 +62,11 @@ Maybe<int32_t> Value::Int32Value(Local<Context> context) const {
 }
     
 bool Value::IsUndefined() const {
-    return JS_IsUndefined(value_);
+    return (bool)JS_IsUndefined(value_);
 }
 
 bool Value::IsNull() const {
-    return JS_IsNull(value_);
+    return (bool)JS_IsNull(value_);
 }
 
 bool Value::IsNullOrUndefined() const {
@@ -74,11 +74,11 @@ bool Value::IsNullOrUndefined() const {
 }
 
 bool Value::IsString() const {
-    return JS_IsString(value_);
+    return (bool)JS_IsString(value_);
 }
 
 bool Value::IsSymbol() const {
-    return JS_IsSymbol(value_);
+    return (bool)JS_IsSymbol(value_);
 }
 
 Isolate* Promise::GetIsolate() {
@@ -165,7 +165,7 @@ void Isolate::ForeachAllocValue(int start, int end, std::function<void(JSValue*,
 }
 
 void Isolate::Escape(JSValue* val) {
-    V8::Check(currentHandleScope, "try to escape a scope, but no scope register!");
+    V8::Check(currentHandleScope != nullptr, "try to escape a scope, but no scope register!");
     currentHandleScope->Escape_(val);
 }
 
@@ -286,27 +286,27 @@ void HandleScope::Exit() {
 }
 
 bool Value::IsFunction() const {
-    return JS_IsFunction(Isolate::current_->GetCurrentContext()->context_, value_);
+    return (bool)JS_IsFunction(Isolate::current_->GetCurrentContext()->context_, value_);
 }
 
 bool Value::IsDate() const {
-    return JS_IsDate(value_);
+    return (bool)JS_IsDate(value_);
 }
 
 bool Value::IsArrayBuffer() const {
-    return PUERTS_IS_ARRAYBUFFER(value_);
+    return (bool)PUERTS_IS_ARRAYBUFFER(value_);
 }
 
 bool Value::IsArrayBufferView() const {
-    return JS_IsArrayBufferView(value_);
+    return (bool)JS_IsArrayBufferView(value_);
 }
 
 bool Value::IsObject() const {
-    return JS_IsObject(value_);
+    return (bool)JS_IsObject(value_);
 }
 
 bool Value::IsArray() const {
-    return JS_IsArray(Isolate::current_->GetCurrentContext()->context_, value_);
+    return (bool)JS_IsArray(Isolate::current_->GetCurrentContext()->context_, value_);
 }
 
 bool Value::IsBigInt() const {
@@ -314,11 +314,11 @@ bool Value::IsBigInt() const {
 }
 
 bool Value::IsBoolean() const {
-    return JS_IsBool(value_);
+    return (bool)JS_IsBool(value_);
 }
 
 bool Value::IsNumber() const {
-    return JS_IsNumber(value_);
+    return (bool)JS_IsNumber(value_);
 }
 
 bool Value::IsExternal() const {
@@ -326,11 +326,11 @@ bool Value::IsExternal() const {
 }
 
 bool Value::IsInt32() const {
-    return JS_IsNumber(value_);
+    return (bool)JS_IsNumber(value_);
 }
 
 bool Value::IsUint32() const{
-    return JS_IsNumber(value_);
+    return (bool)JS_IsNumber(value_);
 }
 
 MaybeLocal<BigInt> Value::ToBigInt(Local<Context> context) const {
@@ -369,11 +369,11 @@ MaybeLocal<Integer> Value::ToInteger(Local<Context> context) const {
 }
 
 bool Value::BooleanValue(Isolate* isolate) const {
-    return JS_ToBool(isolate->current_context_->context_, value_);
+    return (bool)JS_ToBool(isolate->current_context_->context_, value_);
 }
 
 bool Value::IsRegExp() const {
-    return JS_IsRegExp(value_);
+    return (bool)JS_IsRegExp(value_);
 }
 
 
@@ -539,7 +539,7 @@ int64_t BigInt::Int64Value(bool* lossless) const {
 }
 
 bool Boolean::Value() const {
-    return JS_VALUE_GET_BOOL(value_);
+    return (bool)JS_VALUE_GET_BOOL(value_);
 }
 
 Local<Boolean> Boolean::New(Isolate* isolate, bool value) {
@@ -1065,7 +1065,7 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         callbackInfo.data_ = func_data[2];
         callbackInfo.value_ = JS_Undefined();
         //JS_IsConstructor(ctx, this_val)，静态方法的话，用JS_IsConstructor会返回true，其父节点对象是构造函数，这个就是构造函数？//////////
-        callbackInfo.isConstructCall = JS_ToBool(ctx, func_data[3]);
+        callbackInfo.isConstructCall = (bool)JS_ToBool(ctx, func_data[3]);
         
         if (callbackInfo.isConstructCall && internal_field_count > 0) {
             JSValue proto = JS_GetProperty(ctx, this_val, JS_ATOM_prototype);
@@ -1150,10 +1150,10 @@ Maybe<bool> Object::Set(Local<Context> context,
     bool ok = false;
     context->GetIsolate()->Escape(*value);
     if (key->IsNumber()) {
-        ok = JS_SetPropertyUint32(context->context_, value_, key->Uint32Value(context).ToChecked(), value->value_);
+        ok = (bool)JS_SetPropertyUint32(context->context_, value_, key->Uint32Value(context).ToChecked(), value->value_);
     } else {
         JSAtom atom = JS_ValueToAtom(context->context_, key->value_);
-        ok = JS_SetProperty(context->context_, value_, atom, value->value_);
+        ok = (bool)JS_SetProperty(context->context_, value_, atom, value->value_);
         JS_FreeAtom(context->context_, atom);
     }
     
@@ -1165,7 +1165,7 @@ Maybe<bool> Object::Set(Local<Context> context,
     bool ok = false;
     context->GetIsolate()->Escape(*value);
     
-    ok = JS_SetPropertyUint32(context->context_, value_, index, value->value_);
+    ok = (bool)JS_SetPropertyUint32(context->context_, value_, index, value->value_);
     
     return Maybe<bool>(ok);
 }
