@@ -1306,6 +1306,13 @@ uint32_t Array::Length() const {
     return ret;
 }
 
+Maybe<bool> Array::Delete(Local<Context> context, uint32_t index) {
+    if (JS_DeletePropertyInt64(context->context_, value_, index, JS_PROP_THROW) < 0) {
+        return Maybe<bool>(false);
+    }
+    return Maybe<bool>(true);
+}
+
 TryCatch::TryCatch(Isolate* isolate) {
     isolate_ = isolate;
     catched_ = JS_Undefined();

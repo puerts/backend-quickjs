@@ -686,6 +686,7 @@ int JS_HasProperty(JSContext *ctx, JSValueConst this_obj, JSAtom prop);
 int JS_IsExtensible(JSContext *ctx, JSValueConst obj);
 int JS_PreventExtensions(JSContext *ctx, JSValueConst obj);
 int JS_DeleteProperty(JSContext *ctx, JSValueConst obj, JSAtom prop, int flags);
+int JS_DeletePropertyInt64(JSContext *ctx, JSValueConst obj, int64_t idx, int flags);
 int JS_SetPrototype(JSContext *ctx, JSValueConst obj, JSValueConst proto_val);
 JSValue JS_GetPrototype(JSContext *ctx, JSValueConst val);
 

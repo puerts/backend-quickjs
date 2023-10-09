@@ -617,6 +617,8 @@ public:
     V8_INLINE static Array* Cast(Value* obj) {
         return static_cast<Array*>(obj);
     }
+    
+    Maybe<bool> Delete(Local<Context> context, uint32_t index);
 };
 
 class V8_EXPORT Date : public Object {
