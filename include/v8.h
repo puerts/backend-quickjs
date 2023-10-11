@@ -1044,6 +1044,13 @@ public:
         }
     }
     
+    V8_INLINE void SetWeak() {
+        if (!weak_ && val_.SupportWeak()) {
+            weak_ = true;
+            val_.DecRef(isolate_);
+        }
+    }
+    
     V8_INLINE void Reset() {
         if (!weak_ && val_.SupportWeak()) {
             if ((void*)*val_ != (void*)&this->store_) {
