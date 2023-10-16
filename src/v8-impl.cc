@@ -1353,12 +1353,12 @@ MaybeLocal<Value> TryCatch::StackTrace(
     return MaybeLocal<Value>(Local<String>(str));
 }
     
-Local<Message> TryCatch::Message() const {
+Local<class Message> TryCatch::Message() const {
     JSValue ex = (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) ? catched_ : isolate_->exception_;
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_lineNumber);
     
-    Local<Message> message(new Message());
+    Local<class Message> message(new class Message());
     
     if (JS_IsUndefined(fileNameVal)) {
         message->resource_name_ = "<unknow>";
