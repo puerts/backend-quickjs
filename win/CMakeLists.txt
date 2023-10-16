@@ -52,6 +52,8 @@ target_compile_definitions (v8qjs PRIVATE BUILDING_V8_SHARED BUILDING_V8_PLATFOR
 
 endif ()
 
+#target_compile_definitions(v8qjs PRIVATE QJSV8NAMESPACE=v8_qjs)
+
 target_compile_options(v8qjs PRIVATE ${qjs_cflags})
 target_compile_definitions(v8qjs PRIVATE
         _GNU_SOURCE
