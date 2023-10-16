@@ -603,7 +603,7 @@ public:
     
     static Local<Object> New(Isolate* isolate);
     
-    V8_INLINE static Object* Cast(Value* obj) {
+    V8_INLINE static Object* Cast(class Value* obj) {
         return static_cast<Object*>(obj);
     }
 };
@@ -614,7 +614,7 @@ public:
     
     static Local<Array> New(Isolate* isolate);
 
-    V8_INLINE static Array* Cast(Value* obj) {
+    V8_INLINE static Array* Cast(class Value* obj) {
         return static_cast<Array*>(obj);
     }
     
@@ -627,7 +627,7 @@ public:
     
     double ValueOf() const;
     
-    V8_INLINE static Date* Cast(Value* obj) {
+    V8_INLINE static Date* Cast(class Value* obj) {
         return static_cast<Date*>(obj);
     }
 };
@@ -644,7 +644,7 @@ class V8_EXPORT Set : public Object {
 
   static Local<Set> New(Isolate* isolate);
 
-  V8_INLINE static Set* Cast(Value* obj) {
+  V8_INLINE static Set* Cast(class Value* obj) {
     return static_cast<Set*>(obj);
   }
 };
@@ -661,7 +661,7 @@ public:
         Local<Value> key);
     static Local<Map> New(Isolate* isolate);
 
-    V8_INLINE static Map* Cast(Value* obj) {
+    V8_INLINE static Map* Cast(class Value* obj) {
         return static_cast<Map*>(obj);
     }
 };
@@ -710,7 +710,7 @@ public:
 
     std::shared_ptr<BackingStore> GetBackingStore();
     
-    V8_INLINE static ArrayBuffer* Cast(Value* obj) {
+    V8_INLINE static ArrayBuffer* Cast(class Value* obj) {
         return static_cast<ArrayBuffer*>(obj);
     }
 };
@@ -723,14 +723,14 @@ public:
     
     size_t ByteLength();
     
-    V8_INLINE static ArrayBufferView* Cast(Value* obj) {
+    V8_INLINE static ArrayBufferView* Cast(class Value* obj) {
         return static_cast<ArrayBufferView*>(obj);
     }
 };
 
 class V8_EXPORT Promise : public Object {
 public:
-    V8_INLINE static Promise* Cast(Value* obj) {
+    V8_INLINE static Promise* Cast(class Value* obj) {
         return static_cast<Promise*>(obj);
     }
     
@@ -1169,7 +1169,7 @@ using UniquePersistent = Global<T>;
 class V8_EXPORT External : public Value {
 public:
     static Local<External> New(Isolate* isolate, void* value);
-    V8_INLINE static External* Cast(Value* obj) {
+    V8_INLINE static External* Cast(class Value* obj) {
         return static_cast<External*>(obj);
     }
     void* Value() const;
@@ -1183,7 +1183,7 @@ public:
     
     static Local<Number> New(Isolate* isolate, double value);
     
-    V8_INLINE static Number* Cast(Value* obj) {
+    V8_INLINE static Number* Cast(class Value* obj) {
         return static_cast<Number*>(obj);
     }
 };
@@ -1196,7 +1196,7 @@ public:
     
     int64_t Value() const ;
     
-    V8_INLINE static Integer* Cast(Value* obj) {
+    V8_INLINE static Integer* Cast(class Value* obj) {
         return static_cast<Integer*>(obj);
     }
 };
@@ -1205,7 +1205,7 @@ class V8_EXPORT Int32 : public Integer {
 public:
     int32_t Value() const;
     
-    V8_INLINE static Int32* Cast(Value* obj) {
+    V8_INLINE static Int32* Cast(class Value* obj) {
         return static_cast<Int32*>(obj);
     }
 };
@@ -1219,7 +1219,7 @@ public:
     
     int64_t Int64Value(bool* lossless = nullptr) const;
     
-    V8_INLINE static BigInt* Cast(Value* obj) {
+    V8_INLINE static BigInt* Cast(class Value* obj) {
         return static_cast<BigInt*>(obj);
     }
 };
@@ -1228,7 +1228,7 @@ class V8_EXPORT Boolean : public Primitive {
 public:
     bool Value() const;
     
-    V8_INLINE static Boolean* Cast(Value* obj) {
+    V8_INLINE static Boolean* Cast(class Value* obj) {
         return static_cast<Boolean*>(obj);
     }
     static Local<Boolean> New(Isolate* isolate, bool value);
@@ -1237,7 +1237,7 @@ public:
 class V8_EXPORT Name : public Primitive {
 public:
 
-    V8_INLINE static Name* Cast(Value* obj) {
+    V8_INLINE static Name* Cast(class Value* obj) {
         return static_cast<Name*>(obj);
     }
 
@@ -1266,7 +1266,7 @@ public:
 
     static Local<String> Empty(Isolate* isolate);
 
-    V8_INLINE static String* Cast(Value* obj) {
+    V8_INLINE static String* Cast(class Value* obj) {
         return static_cast<String*>(obj);
     }
 
@@ -1303,7 +1303,7 @@ public:
                                                  Local<Value> recv, int argc,
                                                  Local<Value> argv[]);
     
-    V8_INLINE static Function* Cast(Value* obj) {
+    V8_INLINE static Function* Cast(class Value* obj) {
         return static_cast<Function*>(obj);
     }
     
