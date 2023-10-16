@@ -29,17 +29,17 @@ enum
 #define JS_INITPTR(s, t, p) s.tag = t, s.u.ptr = p
 #endif
 
-namespace v8 {
+namespace QJSV8NAMESPACE {
 namespace platform {
 
-std::unique_ptr<v8::Platform> NewDefaultPlatform() {
-    return std::unique_ptr<v8::Platform>{};
+std::unique_ptr<QJSV8NAMESPACE::Platform> NewDefaultPlatform() {
+    return std::unique_ptr<QJSV8NAMESPACE::Platform>{};
 }
 
 }  // namespace platform
-}  // namespace v8
+}  // namespace QJSV8NAMESPACE
 
-namespace v8 {
+namespace QJSV8NAMESPACE {
 
 Maybe<uint32_t> Value::Uint32Value(Local<Context> context) const {
     double d;
@@ -87,7 +87,7 @@ Isolate* Promise::GetIsolate() {
 
 void V8FinalizerWrap(JSRuntime *rt, JSValue val) {
     Isolate* isolate = (Isolate*)JS_GetRuntimeOpaque(rt);
-    v8::Isolate::Scope Isolatescope(isolate);
+    Isolate::Scope Isolatescope(isolate);
     ObjectUserData* objectUdata = reinterpret_cast<ObjectUserData*>(JS_GetOpaque(val, isolate->class_id_));
     if (objectUdata) {
         if (objectUdata->callback_) {
@@ -220,9 +220,9 @@ void Isolate::SetPromiseRejectCallback(PromiseRejectCallback cb) {
 
         Isolate::Scope isolateScope(isolate);
         HandleScope handleScope(isolate);
-        v8::Local<v8::Context> context;
+        Local<Context> context;
         context.val_ = sptr;
-        v8::Context::Scope contextScope(context);
+        Context::Scope contextScope(context);
         
         callback(PromiseRejectMessage(promise, is_handled ? kPromiseHandlerAddedAfterReject : kPromiseRejectWithNoHandler, reason));
     }, (void*)cb);
@@ -238,12 +238,12 @@ Local<Value> Exception::Error(Local<String> message) {
     return Local<Value>(val);
 }
 
-Local<Message> v8::Exception::CreateMessage(Isolate* isolate_, Local<Value> exception) {
+Local<Message> Exception::CreateMessage(Isolate* isolate_, Local<Value> exception) {
     JSValueConst catched_ = exception->value_;
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_lineNumber);
     
-    Local<v8::Message> message(new v8::Message());
+    Local<Message> message(new Message());
     
     if (JS_IsUndefined(fileNameVal)) {
         message->resource_name_ = "<unknow>";
@@ -572,7 +572,7 @@ int32_t Int32::Value() const {
     }
 }
 
-String::Utf8Value::Utf8Value(Isolate* isolate, Local<v8::Value> obj) {
+String::Utf8Value::Utf8Value(Isolate* isolate, Local<Value> obj) {
     auto context = isolate->GetCurrentContext();
     data_ = JS_ToCStringLen(context->context_, &len_, obj->value_);
     context_ = context->context_;
@@ -900,9 +900,9 @@ void ObjectTemplate::InitAccessors(Local<Context> context, JSValue obj) {
                 
                 Isolate::Scope isolateScope(isolate);
                 HandleScope handleScope(isolate);
-                v8::Local<v8::Context> context;
+                Local<Context> context;
                 context.val_ = sptr;
-                v8::Context::Scope contextScope(context);
+                Context::Scope contextScope(context);
 
                 PropertyCallbackInfo<Value> callbackInfo;
                 callbackInfo.isolate_ = isolate;
@@ -935,9 +935,9 @@ void ObjectTemplate::InitAccessors(Local<Context> context, JSValue obj) {
                 
                 Isolate::Scope isolateScope(isolate);
                 HandleScope handleScope(isolate);
-                v8::Local<v8::Context> context;
+                Local<Context> context;
                 context.val_ = sptr;
-                v8::Context::Scope contextScope(context);
+                Context::Scope contextScope(context);
 
                 PropertyCallbackInfo<void> callbackInfo;
                 callbackInfo.isolate_ = isolate;
@@ -1049,9 +1049,9 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         
         Isolate::Scope isolateScope(isolate);
         HandleScope handleScope(isolate);
-        v8::Local<v8::Context> context;
+        Local<Context> context;
         context.val_ = sptr;
-        v8::Context::Scope contextScope(context);
+        Context::Scope contextScope(context);
         
         FunctionCallback callback = (FunctionCallback)(JS_VALUE_GET_PTR(func_data[0]));
         int32_t internal_field_count;
@@ -1353,12 +1353,12 @@ MaybeLocal<Value> TryCatch::StackTrace(
     return MaybeLocal<Value>(Local<String>(str));
 }
     
-Local<v8::Message> TryCatch::Message() const {
+Local<Message> TryCatch::Message() const {
     JSValue ex = (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) ? catched_ : isolate_->exception_;
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_lineNumber);
     
-    Local<v8::Message> message(new v8::Message());
+    Local<Message> message(new Message());
     
     if (JS_IsUndefined(fileNameVal)) {
         message->resource_name_ = "<unknow>";
@@ -1376,4 +1376,4 @@ Local<v8::Message> TryCatch::Message() const {
     return message;
 }
 
-}  // namespace v8
+}  // namespace QJSV8NAMESPACE

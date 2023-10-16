@@ -29,7 +29,7 @@
 #define V8_BUILD_NUMBER 299
 #define V8_PATCH_LEVEL 0
 
-namespace v8 {
+namespace QJSV8NAMESPACE {
 class Object;
 class Isolate;
 class Context;
@@ -1183,7 +1183,7 @@ public:
     
     static Local<Number> New(Isolate* isolate, double value);
     
-    V8_INLINE static Number* Cast(v8::Value* obj) {
+    V8_INLINE static Number* Cast(Value* obj) {
         return static_cast<Number*>(obj);
     }
 };
@@ -1196,7 +1196,7 @@ public:
     
     int64_t Value() const ;
     
-    V8_INLINE static Integer* Cast(v8::Value* obj) {
+    V8_INLINE static Integer* Cast(Value* obj) {
         return static_cast<Integer*>(obj);
     }
 };
@@ -1205,7 +1205,7 @@ class V8_EXPORT Int32 : public Integer {
 public:
     int32_t Value() const;
     
-    V8_INLINE static Int32* Cast(v8::Value* obj) {
+    V8_INLINE static Int32* Cast(Value* obj) {
         return static_cast<Int32*>(obj);
     }
 };
@@ -1219,7 +1219,7 @@ public:
     
     int64_t Int64Value(bool* lossless = nullptr) const;
     
-    V8_INLINE static BigInt* Cast(v8::Value* obj) {
+    V8_INLINE static BigInt* Cast(Value* obj) {
         return static_cast<BigInt*>(obj);
     }
 };
@@ -1228,7 +1228,7 @@ class V8_EXPORT Boolean : public Primitive {
 public:
     bool Value() const;
     
-    V8_INLINE static Boolean* Cast(v8::Value* obj) {
+    V8_INLINE static Boolean* Cast(Value* obj) {
         return static_cast<Boolean*>(obj);
     }
     static Local<Boolean> New(Isolate* isolate, bool value);
@@ -1266,7 +1266,7 @@ public:
 
     static Local<String> Empty(Isolate* isolate);
 
-    V8_INLINE static String* Cast(v8::Value* obj) {
+    V8_INLINE static String* Cast(Value* obj) {
         return static_cast<String*>(obj);
     }
 
@@ -1276,7 +1276,7 @@ public:
 
     class V8_EXPORT Utf8Value {
     public:
-        Utf8Value(Isolate* isolate, Local<v8::Value> obj);
+        Utf8Value(Isolate* isolate, Local<Value> obj);
         
         ~Utf8Value();
         
@@ -1303,7 +1303,7 @@ public:
                                                  Local<Value> recv, int argc,
                                                  Local<Value> argv[]);
     
-    V8_INLINE static Function* Cast(v8::Value* obj) {
+    V8_INLINE static Function* Cast(Value* obj) {
         return static_cast<Function*>(obj);
     }
     
@@ -1425,7 +1425,7 @@ public:
         name_ = *String::Utf8Value(isolate_, name);
     }
     
-    V8_INLINE static FunctionTemplate* Cast(v8::Data* obj) {
+    V8_INLINE static FunctionTemplate* Cast(Data* obj) {
         return static_cast<FunctionTemplate*>(obj);
     }
     
@@ -1678,7 +1678,7 @@ public:
     
     Local<Value> Exception() const;
     
-    Local<v8::Message> Message() const;
+    Local<Message> Message() const;
     
     JSValue catched_;
     
@@ -1762,6 +1762,6 @@ Local<Value> FunctionCallbackInfo<T>::operator[](int i) const {
     return Local<Value>(val);
 }
 
-}  // namespace v8
+}  // namespace QJSV8NAMESPACE
 
 #endif  // INCLUDE_V8_H_

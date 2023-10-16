@@ -5,6 +5,10 @@
 #ifndef V8CONFIG_H_
 #define V8CONFIG_H_
 
+#if !defined(QJSV8NAMESPACE)
+#define QJSV8NAMESPACE v8
+#endif
+
 // clang-format off
 
 // Platform headers for feature detection below.

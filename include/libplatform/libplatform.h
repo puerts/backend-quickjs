@@ -7,12 +7,12 @@
 #include "libplatform/libplatform-export.h"
 #include "v8-platform.h" 
 
-namespace v8 {
+namespace QJSV8NAMESPACE {
 namespace platform {
 
-V8_PLATFORM_EXPORT std::unique_ptr<v8::Platform> NewDefaultPlatform();
+V8_PLATFORM_EXPORT std::unique_ptr<QJSV8NAMESPACE::Platform> NewDefaultPlatform();
 
 }  // namespace platform
-}  // namespace v8
+}  // namespace QJSV8NAMESPACE
 
 #endif  // V8_LIBPLATFORM_LIBPLATFORM_H_

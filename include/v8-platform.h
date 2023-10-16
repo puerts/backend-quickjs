@@ -12,12 +12,12 @@
 #include <string>
 
 
-namespace v8 {
+namespace QJSV8NAMESPACE {
 
 class Platform {
  
 };
 
-}  // namespace v8
+}  // namespace QJSV8NAMESPACE
 
 #endif  // V8_V8_PLATFORM_H_
