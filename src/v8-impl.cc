@@ -29,17 +29,17 @@ enum
 #define JS_INITPTR(s, t, p) s.tag = t, s.u.ptr = p
 #endif
 
-namespace QJSV8NAMESPACE {
+namespace CUSTOMV8NAMESPACE {
 namespace platform {
 
-std::unique_ptr<QJSV8NAMESPACE::Platform> NewDefaultPlatform() {
-    return std::unique_ptr<QJSV8NAMESPACE::Platform>{};
+std::unique_ptr<CUSTOMV8NAMESPACE::Platform> NewDefaultPlatform() {
+    return std::unique_ptr<CUSTOMV8NAMESPACE::Platform>{};
 }
 
 }  // namespace platform
-}  // namespace QJSV8NAMESPACE
+}  // namespace CUSTOMV8NAMESPACE
 
-namespace QJSV8NAMESPACE {
+namespace CUSTOMV8NAMESPACE {
 
 Maybe<uint32_t> Value::Uint32Value(Local<Context> context) const {
     double d;
@@ -1376,4 +1376,4 @@ Local<class Message> TryCatch::Message() const {
     return message;
 }
 
-}  // namespace QJSV8NAMESPACE
+}  // namespace CUSTOMV8NAMESPACE

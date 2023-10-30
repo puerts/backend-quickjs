@@ -29,7 +29,7 @@
 #define V8_BUILD_NUMBER 299
 #define V8_PATCH_LEVEL 0
 
-namespace QJSV8NAMESPACE {
+namespace CUSTOMV8NAMESPACE {
 class Object;
 class Isolate;
 class Context;
@@ -1762,6 +1762,6 @@ Local<Value> FunctionCallbackInfo<T>::operator[](int i) const {
     return Local<Value>(val);
 }
 
-}  // namespace QJSV8NAMESPACE
+}  // namespace CUSTOMV8NAMESPACE
 
 #endif  // INCLUDE_V8_H_
