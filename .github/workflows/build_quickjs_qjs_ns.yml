@@ -1,6 +1,7 @@
 name: build quickjs backend with v8_qjs namespace
 
 on: 
+  push:
   workflow_dispatch:
     inputs:
       tag_date:
@@ -270,7 +271,7 @@ jobs:
           
       - name: Create Release Asset
         run: |
-          cd qjs_v8_bin/ && tar cvfz ../qjs_v8_bin.tgz quickjs && cd -
+          cd qjs_v8_bin/ && mv quickjs quickjs_ns && tar cvfz ../qjs_v8_bin.tgz quickjs_ns && cd -
           
       - name: Create Release
         id: create_release

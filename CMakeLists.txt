@@ -86,6 +86,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 if (QJS_NS)
+    message("using v8_qjs namespace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     target_compile_definitions(quickjs PRIVATE CUSTOMV8NAMESPACE=v8_qjs)
 endif()
 
