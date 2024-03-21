@@ -1,3 +1,9 @@
+if [ -n "$1" ]; then
+    export QJSNS=1
+else
+    export QJSNS=0
+fi
+
 if [ -n "$ANDROID_NDK" ]; then
     export NDK=${ANDROID_NDK}
 elif [ -n "$ANDROID_NDK_HOME" ]; then
@@ -16,7 +22,7 @@ function build() {
     ABI=$2
     TOOLCHAIN_ANME=$3
     BUILD_PATH=build.Android.${ABI}
-    cmake -H. -B${BUILD_PATH} -DANDROID_ABI=${ABI} -DCMAKE_TOOLCHAIN_FILE=${NDK}/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_TOOLCHAIN=clang -DANDROID_TOOLCHAIN_NAME=${TOOLCHAIN_ANME}
+    cmake -H. -B${BUILD_PATH} -DANDROID_ABI=${ABI} -DCMAKE_TOOLCHAIN_FILE=${NDK}/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_TOOLCHAIN=clang -DANDROID_TOOLCHAIN_NAME=${TOOLCHAIN_ANME} -DQJS_NS=${QJSNS}
     cmake --build ${BUILD_PATH} --config Release
     mkdir -p ./qjs/quickjs/Lib/Android/${ABI}/
     cp ${BUILD_PATH}/libquickjs.a ./qjs/quickjs/Lib/Android/${ABI}/libquickjs.a
