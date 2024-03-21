@@ -1,7 +1,6 @@
 name: build quickjs backend with v8_qjs namespace
 
 on: 
-  push:
   workflow_dispatch:
     inputs:
       tag_date:
