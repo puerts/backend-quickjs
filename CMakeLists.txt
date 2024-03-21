@@ -88,6 +88,8 @@ endif()
 if (QJS_NS)
     message("using v8_qjs namespace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     target_compile_definitions(quickjs PRIVATE CUSTOMV8NAMESPACE=v8_qjs)
+else  ()
+    message("using v8 namespace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 endif()
 
 target_include_directories(quickjs PUBLIC ${CMAKE_SOURCE_DIR})
