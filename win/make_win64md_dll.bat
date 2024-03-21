@@ -1,7 +1,6 @@
 if "%1" == "" (
   set QJSNS=0
 ) else (
-  echo "using v8_qjs namespace"
   set QJSNS=1
 )
 
