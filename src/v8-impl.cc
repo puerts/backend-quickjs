@@ -695,10 +695,30 @@ Local<ArrayBuffer> ArrayBuffer::New(Isolate* isolate, void* data, size_t byte_le
     return Local<ArrayBuffer>(ab);
 }
 
+Local<ArrayBuffer> ArrayBuffer::New(Isolate* isolate, std::shared_ptr<BackingStore> backing_store) {
+    ArrayBuffer *ab = isolate->Alloc<ArrayBuffer>();
+    ab->value_ = JS_NewArrayBuffer(isolate->current_context_->context_, (uint8_t*)backing_store->Data(), backing_store->ByteLength(),
+    nullptr, nullptr, false);
+    return Local<ArrayBuffer>(ab);
+}
+
 ArrayBuffer::Contents ArrayBuffer::GetContents() {
     ArrayBuffer::Contents ret;
     ret.data_ = JS_GetArrayBuffer(Isolate::current_->current_context_->context_, &ret.byte_length_, value_);
     return ret;
+}
+
+std::unique_ptr<BackingStore> ArrayBuffer::NewBackingStore(
+    void* data, size_t byte_length, v8::BackingStore::DeleterCallback deleter,
+    void* deleter_data
+) {
+    V8::Check(deleter == BackingStore::EmptyDeleter, "only BackingStore::EmptyDeleter support!");
+
+    BackingStore *ret = new BackingStore;
+    ret->data_ = data;
+    ret->byte_length_ = byte_length;
+    std::unique_ptr<BackingStore> ptr(ret);
+    return ptr;
 }
 
 std::shared_ptr<BackingStore> ArrayBuffer::GetBackingStore() {
