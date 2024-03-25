@@ -1,7 +1,7 @@
-if "%1" == "" (
-  set QJSNS=0
-) else (
+if "%1" == "1" (
   set QJSNS=1
+) else (
+  set QJSNS=0
 )
 
 copy /y ..\build\libquickjs.dll.a ..\build\libquickjs.dll.lib
