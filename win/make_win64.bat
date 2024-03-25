@@ -1,11 +1,11 @@
+mkdir build & pushd build
+
 if "%1" == "1" (
-  set QJSNS=1
+  cmake -S ..\CMakeLists.win.txt -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DQJS_NS=1 -G "Visual Studio 16 2019" -A x64 ..
 ) else (
-  set QJSNS=0
+  cmake -S ..\CMakeLists.win.txt -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G "Visual Studio 16 2019" -A x64 ..
 )
 
-mkdir build & pushd build
-cmake -S ..\CMakeLists.win.txt -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DQJS_NS=${QJSNS} -G "Visual Studio 16 2019" -A x64 ..
 popd
 cmake --build build --config Release
 pause
