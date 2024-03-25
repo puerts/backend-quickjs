@@ -677,6 +677,11 @@ public:
     void* data_;
     
     size_t byte_length_;
+    
+    using DeleterCallback = void (*)(void* data, size_t length,
+                                    void* deleter_data);
+
+    static void EmptyDeleter(void* data, size_t length, void* deleter_data) {}
 };
 
 class V8_EXPORT ArrayBuffer : public Object {
@@ -706,7 +711,14 @@ public:
     static Local<ArrayBuffer> New(Isolate* isolate, void* data, size_t byte_length,
                                   ArrayBufferCreationMode mode = ArrayBufferCreationMode::kExternalized);
     
+    static Local<ArrayBuffer> New(Isolate* isolate,
+                                    std::shared_ptr<BackingStore> backing_store);
+                                    
     Contents GetContents();
+
+    static std::unique_ptr<BackingStore> NewBackingStore(
+        void* data, size_t byte_length, v8::BackingStore::DeleterCallback deleter,
+        void* deleter_data);
 
     std::shared_ptr<BackingStore> GetBackingStore();
     
