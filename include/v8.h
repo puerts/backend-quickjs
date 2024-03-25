@@ -541,6 +541,8 @@ public:
     
     bool IsUint32() const;
     
+    bool IsPromise() const;
+    
     V8_WARN_UNUSED_RESULT MaybeLocal<BigInt> ToBigInt(
         Local<Context> context) const;
     
@@ -742,11 +744,35 @@ public:
 
 class V8_EXPORT Promise : public Object {
 public:
+    enum PromiseState { kPending, kFulfilled, kRejected };
+
     V8_INLINE static Promise* Cast(class Value* obj) {
         return static_cast<Promise*>(obj);
     }
     
     Isolate* GetIsolate();
+
+    class V8_EXPORT Resolver : public Object {
+    public:
+    
+        /**
+         * Create a new resolver, along with an associated promise in pending state.
+         */
+        static V8_WARN_UNUSED_RESULT MaybeLocal<Resolver> New(
+            Local<Context> context);
+
+        Local<Promise> GetPromise();
+
+        V8_WARN_UNUSED_RESULT Maybe<bool> Resolve(Local<Context> context,
+                                                    Local<Value> value);
+
+        V8_WARN_UNUSED_RESULT Maybe<bool> Reject(Local<Context> context,
+                                                    Local<Value> value);
+    };
+
+    Local<Value> Result();
+
+    PromiseState State();
 };
 
 enum {
@@ -1309,6 +1335,21 @@ public:
 private:
 };
 
+/**
+ * A JavaScript symbol (ECMA-262 edition 6)
+ */
+class V8_EXPORT Symbol : public Name {
+ public:
+    static Local<Symbol> New(
+        Isolate* isolate,
+        Local<String> description = Local<String>()
+    );
+                           
+    V8_INLINE static Symbol* Cast(Value* data) {
+        return static_cast<Symbol*>(data);
+    }
+};
+
 class V8_EXPORT Function : public Object {
 public:
     V8_WARN_UNUSED_RESULT MaybeLocal<Value> Call(Local<Context> context,
@@ -1351,6 +1392,7 @@ public:
                              PropertyAttribute attribute = None);
     
     std::map<std::string, Local<Data>> fields_;
+    std::map<JSAtom, Local<Data>> fieldsByAtom_;
     
     class AccessorPropertyInfo {
     public:

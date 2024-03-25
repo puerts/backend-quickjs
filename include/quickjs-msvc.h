@@ -1016,10 +1016,17 @@ JSValue JS_SetDelete(JSContext *ctx, JSValueConst this_val,
 
 void JS_SetClear(JSContext *ctx, JSValueConst this_val);
 JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v);
-
-/*-------end fuctions for v8 api---------*/
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v);
 int JS_ReleaseLoadedModule(JSContext *ctx, const char* path);
+
+JSValue JS_GetPromiseResult(JSContext *ctx, JSValue promise);
+int JS_GetPromiseState(JSValue promise);
+bool JS_FullfillOrRejectPromise(JSContext *ctx, JSValueConst promise,
+                                      JSValueConst value, int is_reject);
+JSValue JS_NewSymbolByAtom(JSContext *ctx, JSAtom descr, int atom_type);
+JSAtom JS_SymbolToAtom(JSContext *ctx, JSValue val);
+int JS_IsPromise(JSValue promise);
+/*-------end fuctions for v8 api---------*/
 
 #undef js_unlikely
 #undef js_force_inline

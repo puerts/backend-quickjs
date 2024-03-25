@@ -85,6 +85,61 @@ Isolate* Promise::GetIsolate() {
     return Isolate::current_;
 }
 
+Local<Value> Promise::Result() {
+    JSValue result = JS_GetPromiseResult(GetIsolate()->GetCurrentContext()->context_, value_);
+
+    Value* val = GetIsolate()->Alloc<Value>();
+    val->value_ = result;
+    return Local<Value>(val);
+}
+
+Promise::PromiseState Promise::State() {
+    int promiseStateInQuickJS = JS_GetPromiseState(value_);
+    switch(promiseStateInQuickJS) {
+        case 0:
+            return Promise::PromiseState::kPending;
+        case 1:
+            return Promise::PromiseState::kFulfilled;
+        case 2:
+            return Promise::PromiseState::kRejected;
+    }
+}
+
+MaybeLocal<Promise::Resolver> Promise::Resolver::New(Local<Context> context) {
+    auto Isolate = context->GetIsolate();
+    Promise::Resolver *resolver = Isolate->Alloc<Promise::Resolver>();
+
+    JSValue resolving_funcs[2];
+    auto ctx = Isolate->current_context_->context_;
+    resolver->value_ = JS_NewPromiseCapability(ctx, resolving_funcs);
+    JS_FreeValue(ctx, resolving_funcs[0]);
+    JS_FreeValue(ctx, resolving_funcs[1]);
+
+    return MaybeLocal<Promise::Resolver>(Local<Promise::Resolver>(resolver));
+}
+
+Local<Promise> Promise::Resolver::GetPromise() {
+    return Local<Promise>(Promise::Cast(this));
+}
+
+Maybe<bool> Promise::Resolver::Resolve(Local<Context> context, Local<Value> value) {
+    return Maybe<bool>(JS_FullfillOrRejectPromise(context->context_, value_, value->value_, 0));
+}
+
+Maybe<bool> Promise::Resolver::Reject(Local<Context> context, Local<Value> value) {
+    return Maybe<bool>(JS_FullfillOrRejectPromise(context->context_, value_, value->value_, 1));
+}
+
+Local<Symbol> Symbol::New(Isolate* isolate, Local<String> description) {
+    auto symbol = isolate->Alloc<Symbol>();
+    symbol->value_ = JS_NewSymbolByAtom(
+        isolate->current_context_->context_, 
+        JS_NewAtom(isolate->current_context_->context_, *String::Utf8Value(isolate, description)),
+        2
+    );
+    return Local<Symbol>(symbol);
+}
+
 void V8FinalizerWrap(JSRuntime *rt, JSValue val) {
     Isolate* isolate = (Isolate*)JS_GetRuntimeOpaque(rt);
     Isolate::Scope Isolatescope(isolate);
@@ -333,6 +388,10 @@ bool Value::IsUint32() const{
     return (bool)JS_IsNumber(value_);
 }
 
+bool Value::IsPromise() const{
+    return (bool)JS_IsPromise(value_);
+}
+
 MaybeLocal<BigInt> Value::ToBigInt(Local<Context> context) const {
     if (IsBigInt()) {
         return MaybeLocal<BigInt>(Local<BigInt>(static_cast<BigInt*>(const_cast<Value*>(this))));
@@ -428,7 +487,6 @@ int String::Utf8Length(Isolate* isolate) const {
 int String::WriteUtf8(Isolate* isolate, char* buffer) const {
     size_t len;
     const char* p = JS_ToCStringLen(isolate->current_context_->context_, &len, value_);
-    
     memcpy(buffer, p, len);
     
     JS_FreeCString(isolate->current_context_->context_, p);
@@ -830,7 +888,15 @@ void Template::Set(Isolate* isolate, const char* name, Local<Data> value) {
 void Template::Set(Local<Name> name, Local<Data> value,
                    PropertyAttribute attributes) {
     Isolate* isolate = Isolate::current_;
-    Set(isolate, *String::Utf8Value(Isolate::current_, name), value);
+    
+    if (name->IsSymbol())
+    {
+        fieldsByAtom_[JS_SymbolToAtom(isolate->current_context_->context_, Symbol::Cast(*name)->value_)] = value;
+    }
+    else
+    {
+        Set(isolate, *String::Utf8Value(Isolate::current_, name), value);
+    }
 }
     
 void Template::SetAccessorProperty(Local<Name> name,
@@ -849,6 +915,13 @@ void Template::InitPropertys(Local<Context> context, JSValue obj) {
         context->GetIsolate()->Escape(*lfunc);
         JS_DefinePropertyValue(context->context_, obj, atom, lfunc->value_, JS_PROP_CONFIGURABLE | JS_PROP_ENUMERABLE | JS_PROP_WRITABLE);
         JS_FreeAtom(context->context_, atom);
+    }
+    for(auto it : fieldsByAtom_) {
+        JSAtom atom = it.first;
+        Local<FunctionTemplate> funcTpl = Local<FunctionTemplate>::Cast(it.second);
+        Local<Function> lfunc = funcTpl->GetFunction(context).ToLocalChecked();
+        context->GetIsolate()->Escape(*lfunc);
+        JS_DefinePropertyValue(context->context_, obj, atom, lfunc->value_, JS_PROP_CONFIGURABLE | JS_PROP_ENUMERABLE | JS_PROP_WRITABLE);
     }
     
     for (auto it : accessor_property_infos_) {
