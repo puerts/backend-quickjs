@@ -717,7 +717,7 @@ public:
     Contents GetContents();
 
     static std::unique_ptr<BackingStore> NewBackingStore(
-        void* data, size_t byte_length, v8::BackingStore::DeleterCallback deleter,
+        void* data, size_t byte_length, BackingStore::DeleterCallback deleter,
         void* deleter_data);
 
     std::shared_ptr<BackingStore> GetBackingStore();
