@@ -1691,6 +1691,7 @@ public:
     Local<Value> Exception() const;
     
     Local<class Message> Message() const;
+    void handleException();
     
     JSValue catched_;
     
