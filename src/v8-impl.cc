@@ -85,6 +85,19 @@ Isolate* Promise::GetIsolate() {
     return Isolate::current_;
 }
 
+Local<Symbol> Symbol::New(Isolate* isolate, Local<String> description) {
+    auto symbol = isolate->Alloc<Symbol>();
+    auto context = isolate->current_context_->context_;
+    auto atom = JS_NewAtom(context, *String::Utf8Value(isolate, description));
+    symbol->value_ = JS_NewSymbolByAtom(
+        isolate->current_context_->context_, 
+        atom,
+        2
+    );
+    JS_FreeAtom(context, atom);
+    return Local<Symbol>(symbol);
+}
+
 void V8FinalizerWrap(JSRuntime *rt, JSValue val) {
     Isolate* isolate = (Isolate*)JS_GetRuntimeOpaque(rt);
     Isolate::Scope Isolatescope(isolate);
@@ -428,7 +441,6 @@ int String::Utf8Length(Isolate* isolate) const {
 int String::WriteUtf8(Isolate* isolate, char* buffer) const {
     size_t len;
     const char* p = JS_ToCStringLen(isolate->current_context_->context_, &len, value_);
-    
     memcpy(buffer, p, len);
     
     JS_FreeCString(isolate->current_context_->context_, p);
@@ -804,13 +816,22 @@ MaybeLocal<Object> Function::NewInstance(Local<Context> context, int argc, Local
 }
 
 void Template::Set(Isolate* isolate, const char* name, Local<Data> value) {
-    fields_[name] = value;
+    // fields_[name] = value;
+    fieldsByAtom_[JS_NewAtom(isolate->current_context_->context_, name)] = value;
 }
 
 void Template::Set(Local<Name> name, Local<Data> value,
                    PropertyAttribute attributes) {
     Isolate* isolate = Isolate::current_;
-    Set(isolate, *String::Utf8Value(Isolate::current_, name), value);
+    
+    if (name->IsSymbol())
+    {
+        fieldsByAtom_[JS_SymbolToAtom(isolate->current_context_->context_, Symbol::Cast(*name)->value_)] = value;
+    }
+    else
+    {
+        Set(isolate, *String::Utf8Value(Isolate::current_, name), value);
+    }
 }
     
 void Template::SetAccessorProperty(Local<Name> name,
@@ -822,13 +843,20 @@ void Template::SetAccessorProperty(Local<Name> name,
 }
 
 void Template::InitPropertys(Local<Context> context, JSValue obj) {
-    for(auto it : fields_) {
-        JSAtom atom = JS_NewAtom(context->context_, it.first.data());
+    // for(auto it : fields_) {
+    //     JSAtom atom = JS_NewAtom(context->context_, it.first.data());
+    //     Local<FunctionTemplate> funcTpl = Local<FunctionTemplate>::Cast(it.second);
+    //     Local<Function> lfunc = funcTpl->GetFunction(context).ToLocalChecked();
+    //     context->GetIsolate()->Escape(*lfunc);
+    //     JS_DefinePropertyValue(context->context_, obj, atom, lfunc->value_, JS_PROP_CONFIGURABLE | JS_PROP_ENUMERABLE | JS_PROP_WRITABLE);
+    //     JS_FreeAtom(context->context_, atom);
+    // }
+    for(auto it : fieldsByAtom_) {
+        JSAtom atom = it.first;
         Local<FunctionTemplate> funcTpl = Local<FunctionTemplate>::Cast(it.second);
         Local<Function> lfunc = funcTpl->GetFunction(context).ToLocalChecked();
         context->GetIsolate()->Escape(*lfunc);
         JS_DefinePropertyValue(context->context_, obj, atom, lfunc->value_, JS_PROP_CONFIGURABLE | JS_PROP_ENUMERABLE | JS_PROP_WRITABLE);
-        JS_FreeAtom(context->context_, atom);
     }
     
     for (auto it : accessor_property_infos_) {
@@ -1034,7 +1062,7 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         JS_DupValueRT(isolate_->runtime_, ret->value_);
         return MaybeLocal<Function>(Local<Function>(ret));
     }
-    cfunction_data_.is_construtor_ = !prototype_template_.IsEmpty() || !instance_template_.IsEmpty() || fields_.size() > 0 || accessor_property_infos_.size() > 0 || !parent_.IsEmpty();
+    cfunction_data_.is_construtor_ = !prototype_template_.IsEmpty() || !instance_template_.IsEmpty() || fieldsByAtom_.size() > 0 || accessor_property_infos_.size() > 0 || !parent_.IsEmpty();
     cfunction_data_.internal_field_count_ = instance_template_.IsEmpty() ? 0 : instance_template_->internal_field_count_;
     
     JSValue func_data[4];
