@@ -541,6 +541,8 @@ public:
     
     bool IsUint32() const;
     
+    bool IsPromise() const;
+    
     V8_WARN_UNUSED_RESULT MaybeLocal<BigInt> ToBigInt(
         Local<Context> context) const;
     
@@ -742,11 +744,35 @@ public:
 
 class V8_EXPORT Promise : public Object {
 public:
+    enum PromiseState { kPending, kFulfilled, kRejected };
+
     V8_INLINE static Promise* Cast(class Value* obj) {
         return static_cast<Promise*>(obj);
     }
     
     Isolate* GetIsolate();
+
+    class V8_EXPORT Resolver : public Object {
+    public:
+    
+        /**
+         * Create a new resolver, along with an associated promise in pending state.
+         */
+        static V8_WARN_UNUSED_RESULT MaybeLocal<Resolver> New(
+            Local<Context> context);
+
+        Local<Promise> GetPromise();
+
+        V8_WARN_UNUSED_RESULT Maybe<bool> Resolve(Local<Context> context,
+                                                    Local<Value> value);
+
+        V8_WARN_UNUSED_RESULT Maybe<bool> Reject(Local<Context> context,
+                                                    Local<Value> value);
+    };
+
+    Local<Value> Result();
+
+    PromiseState State();
 };
 
 enum {
