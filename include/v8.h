@@ -1110,6 +1110,7 @@ public:
     JSValue store_;
     
     V8_INLINE Local<T> Get(Isolate* isolate) const {
+        if (IsEmpty()) return Local<T>();
         Local<T> ret = val_.Clone(isolate, (Value*)(&this->store_));
         ret.IncRef(isolate);
         return ret;
