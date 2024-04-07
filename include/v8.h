@@ -1310,6 +1310,21 @@ public:
 private:
 };
 
+/**
+ * A JavaScript symbol (ECMA-262 edition 6)
+ */
+class V8_EXPORT Symbol : public Name {
+ public:
+    static Local<Symbol> New(
+        Isolate* isolate,
+        Local<String> description = Local<String>()
+    );
+                           
+    V8_INLINE static Symbol* Cast(Value* data) {
+        return static_cast<Symbol*>(data);
+    }
+};
+
 class V8_EXPORT Function : public Object {
 public:
     V8_WARN_UNUSED_RESULT MaybeLocal<Value> Call(Local<Context> context,
@@ -1351,7 +1366,8 @@ public:
                              Local<FunctionTemplate> setter = Local<FunctionTemplate>(),
                              PropertyAttribute attribute = None);
     
-    std::map<std::string, Local<Data>> fields_;
+    // std::map<std::string, Local<Data>> fields_;
+    std::map<JSAtom, Local<Data>> fieldsByAtom_;
     
     class AccessorPropertyInfo {
     public:

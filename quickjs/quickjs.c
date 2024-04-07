@@ -54158,9 +54158,6 @@ JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v)
 {
     return JS_DupValue(ctx, JS_MKPTR(JS_TAG_MODULE, v));
 }
-
-/*-------end fuctions for v8 api---------*/
-
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v)
 {
     return js_get_module_ns(ctx, v);
@@ -54187,3 +54184,13 @@ int JS_ReleaseLoadedModule(JSContext *ctx, const char* path)
     JS_FreeAtom(ctx, name);
     return 0;
 }
+JSValue JS_NewSymbolByAtom(JSContext *ctx, JSAtom descr, int atom_type)
+{
+    return JS_NewSymbolFromAtom(ctx, descr, atom_type);
+}
+
+JSAtom JS_SymbolToAtom(JSContext *ctx, JSValue val)
+{
+    return js_symbol_to_atom(ctx, val);
+}
+/*-------end fuctions for v8 api---------*/
