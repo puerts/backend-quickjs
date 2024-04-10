@@ -53838,6 +53838,10 @@ JSValue JS_Undefined() {
     return JS_UNDEFINED;
 }
 
+JSValue JS_Exception() {
+    return JS_EXCEPTION;
+}
+
 JS_BOOL JS_IsArrayBuffer(JSValueConst obj)
 {
     JSObject *p;
