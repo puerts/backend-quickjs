@@ -54163,6 +54163,11 @@ JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v)
     return JS_DupValue(ctx, JS_MKPTR(JS_TAG_MODULE, v));
 }
 
+char *JS_DefaultModuleNameNormalize(JSContext *ctx, const char *base_name, const char *name)
+{
+    return js_default_module_normalize_name(ctx, base_name, name);
+}
+
 /*-------end fuctions for v8 api---------*/
 
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v)

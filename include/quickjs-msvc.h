@@ -1018,6 +1018,8 @@ JSValue JS_SetDelete(JSContext *ctx, JSValueConst this_val,
 void JS_SetClear(JSContext *ctx, JSValueConst this_val);
 JSValue JS_DupModule(JSContext *ctx, JSModuleDef* v);
 
+char *JS_DefaultModuleNameNormalize(JSContext *ctx, const char *base_name, const char *name);
+
 /*-------end fuctions for v8 api---------*/
 JSValue JS_GET_MODULE_NS(JSContext *ctx, JSModuleDef* v);
 int JS_ReleaseLoadedModule(JSContext *ctx, const char* path);
