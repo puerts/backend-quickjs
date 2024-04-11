@@ -430,6 +430,7 @@ int String::WriteUtf8(Isolate* isolate, char* buffer) const {
     const char* p = JS_ToCStringLen(isolate->current_context_->context_, &len, value_);
     
     memcpy(buffer, p, len);
+    buffer[len] = '\0';
     
     JS_FreeCString(isolate->current_context_->context_, p);
     return (int)len;
