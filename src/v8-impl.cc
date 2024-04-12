@@ -469,8 +469,7 @@ MaybeLocal<Value> Script::Run(Local<Context> context) {
     auto isolate = context->GetIsolate();
 
     String::Utf8Value source(isolate, source_);
-    String::Utf8Value resource_name(isolate, resource_name_.ToLocalChecked());
-    const char *filename = resource_name_.IsEmpty() ? "eval" : *resource_name;
+    const char *filename = resource_name_.IsEmpty() ? "eval" : *String::Utf8Value(isolate, resource_name_.ToLocalChecked());
     auto ret = JS_Eval(context->context_, *source, source.length(), filename, JS_EVAL_TYPE_GLOBAL);
 
     return ProcessResult(isolate, ret);
