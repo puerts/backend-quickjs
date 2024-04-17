@@ -1113,13 +1113,15 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         return callbackInfo.isConstructCall ? callbackInfo.this_ : callbackInfo.value_;
     }, 0, 0, 4, &func_data[0]);
     
+    auto aname = JS_NewAtom(context->context_, name_.c_str());
     JS_DefinePropertyValue( 
         context->context_, 
         func, 
         JS_ATOM_name,
-        JS_AtomToString(context->context_, JS_NewAtom(context->context_, name_.c_str())), 
+        JS_AtomToString(context->context_, aname), 
         JS_PROP_CONFIGURABLE
     );
+    JS_FreeAtom(context->context_, aname);
 
     if (cfunction_data_.is_construtor_) {
         JS_SetConstructorBit(context->context_, func, 1);
