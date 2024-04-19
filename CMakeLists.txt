@@ -58,7 +58,6 @@ if ( MSYS )
     endif()
     target_compile_definitions(quickjs PRIVATE
         _GNU_SOURCE
-        CONFIG_BIGNUM
         CONFIG_VERSION="\\\"${QJS_VERSION_STR}\\\""
         )
 else()
@@ -69,7 +68,6 @@ else()
     endif()
     target_compile_definitions(quickjs PRIVATE
         _GNU_SOURCE
-        CONFIG_BIGNUM
         CONFIG_VERSION="${QJS_VERSION_STR}"
     )
 endif()
