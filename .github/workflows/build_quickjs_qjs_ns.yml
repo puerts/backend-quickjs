@@ -7,6 +7,11 @@ on:
       tag_date:
         description: 'tag date'     
         required: true
+      is_build_for_ohos:
+        description: 'Build for harmony platform'
+        type: boolean
+        default: true
+        required: false
 jobs:
   build_macos:
     name: macOS
@@ -91,6 +96,30 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod +x make_android.sh
         ANDROID_NDK=~/android-ndk-r21b ./make_android.sh 1
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
+        
+  build_ohos:
+    if: github.event.inputs.is_build_for_ohos == 'true'
+    name: OHOS 
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install NDK
+      run: |
+        cd ~
+        curl -O https://repo.huaweicloud.com/harmonyos/os/4.1-Release/ohos-sdk-windows_linux-public.tar.gz
+        tar xvfz ohos-sdk-windows_linux-public.tar.gz
+        cd ohos-sdk/linux
+        unzip -o -d ./ native-linux-x64-4.1.7.5-Release.zip
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x make_ohos.sh
+        OHOS_NDK_HOME=~/ohos-sdk/linux/native ./make_ohos.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v3
       with:
@@ -269,7 +298,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.tag_date != '' }}
-    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux]
+    needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux,build_ohos]
     steps:
       - uses: actions/download-artifact@v1
         with:
