@@ -119,7 +119,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         chmod +x make_ohos.sh
-        OHOS_NDK_HOME=~/ohos-sdk/linux/native ./make_ohos.sh
+        OHOS_NDK_HOME=~/ohos-sdk/linux/native ./make_ohos.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v3
       with:
