@@ -244,6 +244,9 @@ Local<Value> Exception::Error(Local<String> message) {
 
 Local<Message> Exception::CreateMessage(Isolate* isolate_, Local<Value> exception) {
     JSValueConst catched_ = exception->value_;
+    if (!JS_IsObject(catched_)) {
+        return Local<Message>();
+    }
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_lineNumber);
     
@@ -1381,6 +1384,9 @@ MaybeLocal<Value> TryCatch::StackTrace(
     
 Local<class Message> TryCatch::Message() const {
     JSValue ex = (!JS_IsUndefined(catched_)) ? catched_ : isolate_->exception_;
+    if (!JS_IsObject(ex)) {
+        return Local<class Message>();
+    }
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_lineNumber);
     
