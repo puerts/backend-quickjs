@@ -174,7 +174,11 @@ Isolate* Isolate::current_ = nullptr;
 void Isolate::handleException() {
     JSValue ex = JS_GetException(current_context_->context_);
     
-    if (!JS_IsUndefined(ex) && !JS_IsNull(ex)) {
+    if (!JS_IsUndefined(ex)) {
+        if (JS_IsNull(ex)) {
+            std::cerr << "Uncaught exception(null)" << std::endl;
+            return;
+        }
         JSValue fileNameVal = JS_GetProperty(current_context_->context_, ex, JS_ATOM_fileName);
         JSValue lineNumVal = JS_GetProperty(current_context_->context_, ex, JS_ATOM_lineNumber);
         
@@ -1345,24 +1349,24 @@ TryCatch::TryCatch(Isolate* isolate) {
 TryCatch::~TryCatch() {
     isolate_->currentTryCatch_ = prev_;
     JS_FreeValue(isolate_->current_context_->context_, catched_);
-    if (!JS_IsUndefined(isolate_->exception_) && !JS_IsNull(isolate_->exception_)) {
+    if (!JS_IsUndefined(isolate_->exception_)) {
         JS_FreeValueRT(isolate_->runtime_, isolate_->exception_);
         isolate_->exception_ = JS_Undefined();
     }
 }
     
 bool TryCatch::HasCaught() const {
-    return (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) || (!JS_IsUndefined(isolate_->exception_) && !JS_IsNull(isolate_->exception_));
+    return (!JS_IsUndefined(catched_)) || (!JS_IsUndefined(isolate_->exception_));
 }
     
 Local<Value> TryCatch::Exception() const {
-    return (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) ? Local<Value>(reinterpret_cast<Value*>(const_cast<JSValue*>(&catched_)))
+    return (!JS_IsUndefined(catched_)) ? Local<Value>(reinterpret_cast<Value*>(const_cast<JSValue*>(&catched_)))
                : Local<Value>(reinterpret_cast<Value*>(&isolate_->exception_));
 }
 
 MaybeLocal<Value> TryCatch::StackTrace(Local<Context> context) const {
     auto str = context->GetIsolate()->Alloc<String>();
-    JSValue ex = (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) ? catched_ : isolate_->exception_;
+    JSValue ex = (!JS_IsUndefined(catched_)) ? catched_ : isolate_->exception_;
     str->value_ = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_stack);;
     return MaybeLocal<Value>(Local<String>(str));
 }
@@ -1376,7 +1380,7 @@ MaybeLocal<Value> TryCatch::StackTrace(
 }
     
 Local<class Message> TryCatch::Message() const {
-    JSValue ex = (!JS_IsUndefined(catched_) && !JS_IsNull(catched_)) ? catched_ : isolate_->exception_;
+    JSValue ex = (!JS_IsUndefined(catched_)) ? catched_ : isolate_->exception_;
     JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_fileName);
     JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_lineNumber);
     
