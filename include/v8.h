@@ -874,7 +874,9 @@ public:
     
     int value_alloc_pos_ = 0;
     
-    JSValue exception_;
+    JSValue pendingException_;
+    
+    bool hasPendingException_;
     
     HandleScope *currentHandleScope = nullptr;
     

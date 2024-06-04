@@ -111,7 +111,8 @@ Isolate::Isolate(void* external_runtime) : current_context_(nullptr) {
     literal_values_[kFalseValueIndex] = JS_False();
     literal_values_[kEmptyStringIndex] = JS_Undefined();
     
-    exception_ = JS_Undefined();
+    pendingException_ = JS_Undefined();
+    hasPendingException_ = false;
     
     JSClassDef cls_def;
     cls_def.class_name = "__v8_simulate_obj";
@@ -209,7 +210,8 @@ void Isolate::LowMemoryNotification() {
 }
 
 Local<Value> Isolate::ThrowException(Local<Value> exception) {
-    exception_ = exception->value_;
+    pendingException_ = exception->value_;
+    hasPendingException_ = true;
     this->Escape(*exception);
     return Local<Value>(exception);
 }
@@ -458,7 +460,8 @@ MaybeLocal<Script> Script::Compile(
 static V8_INLINE MaybeLocal<Value> ProcessResult(Isolate *isolate, JSValue ret) {
     Value* val = nullptr;
     if (JS_IsException(ret)) {
-        isolate->exception_ = JS_GetException(isolate->current_context_->context_);
+        isolate->pendingException_ = JS_GetException(isolate->current_context_->context_);
+        isolate->hasPendingException_ = true;
         if (!isolate->currentTryCatch_) {
             isolate->handleException();
         }
@@ -942,9 +945,10 @@ void ObjectTemplate::InitAccessors(Local<Context> context, JSValue obj) {
                 AccessorNameGetterCallback callback = (AccessorNameGetterCallback)(JS_VALUE_GET_PTR(func_data[0]));
                 callback(Local<String>(key), callbackInfo);
                 
-                if (!JS_IsUndefined(isolate->exception_)) {
-                    JSValue ex = isolate->exception_;
-                    isolate->exception_ = JS_Undefined();
+                if (isolate->hasPendingException_) {
+                    JSValue ex = isolate->pendingException_;
+                    isolate->pendingException_ = JS_Undefined();
+                    isolate->hasPendingException_ = false;
                     return JS_Throw(ctx, ex);
                 }
                 
@@ -978,9 +982,10 @@ void ObjectTemplate::InitAccessors(Local<Context> context, JSValue obj) {
                 AccessorNameSetterCallback callback = (AccessorNameSetterCallback)(JS_VALUE_GET_PTR(func_data[0]));
                 callback(Local<String>(key), Local<Value>(val), callbackInfo);
                 
-                if (!JS_IsUndefined(isolate->exception_)) {
-                    JSValue ex = isolate->exception_;
-                    isolate->exception_ = JS_Undefined();
+                if (isolate->hasPendingException_) {
+                    JSValue ex = isolate->pendingException_;
+                    isolate->pendingException_ = JS_Undefined();
+                    isolate->hasPendingException_ = false;
                     return JS_Throw(ctx, ex);
                 }
                 
@@ -1107,12 +1112,13 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
         
         callback(callbackInfo);
         
-        if (!JS_IsUndefined(isolate->exception_)) {
+        if (isolate->hasPendingException_) {
             if (callbackInfo.isConstructCall && internal_field_count > 0) {
                 JS_FreeValue(ctx, callbackInfo.this_);
             }
-            JSValue ex = isolate->exception_;
-            isolate->exception_ = JS_Undefined();
+            JSValue ex = isolate->pendingException_;
+            isolate->pendingException_ = JS_Undefined();
+            isolate->hasPendingException_ = false;
             //isolate->Escape(&ex);
             return JS_Throw(ctx, ex);
         }
@@ -1352,24 +1358,25 @@ TryCatch::TryCatch(Isolate* isolate) {
 TryCatch::~TryCatch() {
     isolate_->currentTryCatch_ = prev_;
     JS_FreeValue(isolate_->current_context_->context_, catched_);
-    if (!JS_IsUndefined(isolate_->exception_)) {
-        JS_FreeValueRT(isolate_->runtime_, isolate_->exception_);
-        isolate_->exception_ = JS_Undefined();
+    if (isolate_->hasPendingException_) {
+        JS_FreeValueRT(isolate_->runtime_, isolate_->pendingException_);
+        isolate_->pendingException_ = JS_Undefined();
+        isolate_->hasPendingException_ = false;
     }
 }
     
 bool TryCatch::HasCaught() const {
-    return (!JS_IsUndefined(catched_)) || (!JS_IsUndefined(isolate_->exception_));
+    return (!JS_IsUndefined(catched_)) || isolate_->hasPendingException_;
 }
     
 Local<Value> TryCatch::Exception() const {
-    return (!JS_IsUndefined(catched_)) ? Local<Value>(reinterpret_cast<Value*>(const_cast<JSValue*>(&catched_)))
-               : Local<Value>(reinterpret_cast<Value*>(&isolate_->exception_));
+    return isolate_->hasPendingException_ ? Local<Value>(reinterpret_cast<Value*>(&isolate_->pendingException_))
+               : Local<Value>(reinterpret_cast<Value*>(const_cast<JSValue*>(&catched_)));
 }
 
 MaybeLocal<Value> TryCatch::StackTrace(Local<Context> context) const {
     auto str = context->GetIsolate()->Alloc<String>();
-    JSValue ex = (!JS_IsUndefined(catched_)) ? catched_ : isolate_->exception_;
+    JSValue ex = isolate_->hasPendingException_ ?  isolate_->pendingException_ : catched_;
     str->value_ = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_stack);;
     return MaybeLocal<Value>(Local<String>(str));
 }
@@ -1383,7 +1390,7 @@ MaybeLocal<Value> TryCatch::StackTrace(
 }
     
 Local<class Message> TryCatch::Message() const {
-    JSValue ex = (!JS_IsUndefined(catched_)) ? catched_ : isolate_->exception_;
+    JSValue ex = isolate_->hasPendingException_ ?  isolate_->pendingException_ : catched_;
     if (!JS_IsObject(ex)) {
         return Local<class Message>();
     }
