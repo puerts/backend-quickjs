@@ -14,7 +14,7 @@ cd ..
 
 mkdir -p build_wasm && cd build_wasm
 emcmake cmake -DQJS_NS=${QJSNS} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
-emcmake cmake --build build_linux64 --config Release
+emmake make
 cd ..
 mkdir -p ./qjs/quickjs/Lib/wasm/
 cp build_wasm/libquickjs.a ./qjs/quickjs/Lib/wasm/
