@@ -148,6 +148,29 @@ jobs:
       with:
         name: qjs_v8_bin
         path: ~/qjs/**/*
+        
+  build_wasm:
+    name: wasm 
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install LibC++
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang
+        sudo apt-get install build-essential
+        sudo apt-get install libc++-dev
+        sudo apt-get install libc++abi-dev
+    - name: Run build script
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x make_wasm.sh
+        ./make_wasm.sh
+        cp -r $GITHUB_WORKSPACE/qjs ~/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qjs_v8_bin
+        path: ~/qjs/**/*
 
   build_window_dll:
     name: Windows
