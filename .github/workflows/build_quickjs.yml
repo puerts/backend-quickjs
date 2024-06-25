@@ -166,6 +166,8 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod +x make_wasm.sh
         ./make_wasm.sh
+        chmod +x make_wasm_bc.sh
+        ./make_wasm_bc.sh
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v3
       with:
