@@ -13,7 +13,7 @@ source ./emsdk_env.sh
 cd ..
 
 mkdir -p build_wasm && cd build_wasm
-emcmake cmake -DQJS_NS=${QJSNS} -DEMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
+emcmake cmake -DQJS_NS=${QJSNS} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
 emmake make
 cd ..
 mkdir -p ./qjs/quickjs/Lib/wasm/wasm32
