@@ -104,7 +104,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
         -fwasm-exceptions 
         -mbulk-memory 
         -mnontrapping-fptoint 
-        -msse4.2 
+        -msse4.2
+        -pthread
     )
 endif ()
 
