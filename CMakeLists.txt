@@ -98,6 +98,18 @@ else  ()
     message("using v8 namespace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 endif()
 
+if (CMAKE_SYSTEM_NAME MATCHES "Emscripten") 
+    target_compile_options(quickjs PRIVATE 
+        -msimd128 
+        -fwasm-exceptions 
+        -mbulk-memory 
+        -mnontrapping-fptoint 
+        -msse4.2 
+        -sWASM_BIGINT 
+        -sSUPPORT_LONGJMP=wasm
+    )
+endif ()
+
 target_include_directories(quickjs PUBLIC ${CMAKE_SOURCE_DIR})
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_link_libraries(quickjs atomic)
