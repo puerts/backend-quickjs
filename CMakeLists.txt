@@ -100,10 +100,7 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Emscripten") 
     target_compile_options(quickjs PRIVATE 
-        -msimd128 
         -fwasm-exceptions 
-        -mbulk-memory 
-        -mnontrapping-fptoint 
         -msse4.2
         -pthread
     )
