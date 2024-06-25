@@ -7,8 +7,8 @@ fi
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 git pull
-./emsdk install latest
-./emsdk activate latest
+./emsdk install 3.1.8
+./emsdk activate 3.1.8
 source ./emsdk_env.sh
 cd ..
 
