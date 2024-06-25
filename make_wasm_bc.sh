@@ -12,9 +12,9 @@ git pull
 source ./emsdk_env.sh
 cd ..
 
-mkdir -p build_wasm && cd build_wasm
+mkdir -p build_wasm_bc && cd build_wasm_bc
 emcmake cmake -DQJS_NS=${QJSNS} -DBIYE_CODE=1 -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
 emmake make
 cd ..
 mkdir -p ./qjs/quickjs/Lib/wasm/bc
-cp build_wasm/libquickjs.bc ./qjs/quickjs/Lib/wasm/bc/
+cp build_wasm_bc/libquickjs.bc ./qjs/quickjs/Lib/wasm/bc/
