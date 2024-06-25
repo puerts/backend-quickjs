@@ -105,8 +105,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
         -mbulk-memory 
         -mnontrapping-fptoint 
         -msse4.2 
-        -sWASM_BIGINT 
-        -sSUPPORT_LONGJMP=wasm
     )
 endif ()
 
