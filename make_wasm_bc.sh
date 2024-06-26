@@ -17,6 +17,6 @@ emcmake cmake -DQJS_NS=${QJSNS} -DBIYE_CODE=1 -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .
 emmake make
 cd ..
 mkdir -p ./qjs/quickjs/Lib/wasm/bc
-sudo apt-get install tree
-tree build_wasm_bc
-cp build_wasm_bc/libquickjs.bc ./qjs/quickjs/Lib/wasm/bc/
+#sudo apt-get install tree
+#tree build_wasm_bc
+cp build_wasm_bc/libquickjs.a ./qjs/quickjs/Lib/wasm/bc/
