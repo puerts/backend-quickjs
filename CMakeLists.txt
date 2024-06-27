@@ -80,9 +80,11 @@ if (UNIX AND NOT OHOS AND NOT (CMAKE_SYSTEM_NAME MATCHES "Emscripten"))
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
 endif ()
 
-if ((CMAKE_SYSTEM_NAME MATCHES "Emscripten") AND BIYE_CODE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -emit-llvm")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -emit-llvm")
+if (BIYE_CODE)
+    set(CMAKE_C_COMPILER clang)
+    set(CMAKE_CXX_COMPILER clang++)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -flto")
 endif ()
 
 #set_target_properties(quickjs PROPERTIES

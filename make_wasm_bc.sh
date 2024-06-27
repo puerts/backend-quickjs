@@ -4,19 +4,10 @@ else
     export QJSNS=0
 fi
 
-git clone https://github.com/emscripten-core/emsdk.git
-cd emsdk
-git pull
-./emsdk install 3.1.8
-./emsdk activate 3.1.8
-source ./emsdk_env.sh
-cd ..
 
-mkdir -p build_wasm_bc && cd build_wasm_bc
-emcmake cmake -DQJS_NS=${QJSNS} -DBIYE_CODE=1 -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
-emmake make
+mkdir -p build_bc && cd build_bc
+cmake -DQJS_NS=${QJSNS} -DBIYE_CODE=1 -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ../
+make
 cd ..
 mkdir -p ./qjs/quickjs/Lib/wasm/bc
-#sudo apt-get install tree
-#tree build_wasm_bc
-cp build_wasm_bc/libquickjs.a ./qjs/quickjs/Lib/wasm/bc/
+find build_bc -type f -name "*.o" -exec bash -c 'cp "$0" "qjs/quickjs/Lib/wasm/bc/$(basename "$0" .o).bc"' {} \;
