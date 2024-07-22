@@ -1,4 +1,10 @@
+#ifdef USING_IN_UNREAL_ENGINE
+PRAGMA_DISABLE_UNDEFINED_IDENTIFIER_WARNINGS
+#endif
 #include "v8.h"
+#ifdef USING_IN_UNREAL_ENGINE
+PRAGMA_ENABLE_UNDEFINED_IDENTIFIER_WARNINGS
+#endif
 #include<cstring>
 #include <algorithm>
 
