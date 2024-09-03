@@ -117,6 +117,11 @@ typedef const struct __JSValue *JSValueConst;
 
 #define JS_NAN JS_MKVAL(JS_TAG_FLOAT64, 1)
 
+static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
+{
+    return JS_MKVAL(JS_TAG_FLOAT64, (int)d);
+}
+
 static inline JS_BOOL JS_VALUE_IS_NAN(JSValue v)
 {
     return 0;
@@ -371,6 +376,7 @@ void JS_AddIntrinsicPromise(JSContext *ctx);
 void JS_AddIntrinsicBigInt(JSContext *ctx);
 void JS_AddIntrinsicBigFloat(JSContext *ctx);
 void JS_AddIntrinsicBigDecimal(JSContext *ctx);
+void JS_AddIntrinsicWeakRef(JSContext *ctx);
 /* enable operator overloading */
 void JS_AddIntrinsicOperators(JSContext *ctx);
 /* enable "use math" */
@@ -503,9 +509,64 @@ int JS_IsRegisteredClass(JSRuntime *rt, JSClassID class_id);
 
 /* value handling */
 
+static js_force_inline JSValue JS_NewBool(JSContext *ctx, JS_BOOL val)
+{
+    return JS_MKVAL(JS_TAG_BOOL, (val != 0));
+}
+
+static js_force_inline JSValue JS_NewInt32(JSContext *ctx, int32_t val)
+{
+    return JS_MKVAL(JS_TAG_INT, val);
+}
+
+static js_force_inline JSValue JS_NewCatchOffset(JSContext *ctx, int32_t val)
+{
+    return JS_MKVAL(JS_TAG_CATCH_OFFSET, val);
+}
+
+static js_force_inline JSValue JS_NewInt64(JSContext *ctx, int64_t val)
+{
+    JSValue v;
+    if (val == (int32_t)val) {
+        v = JS_NewInt32(ctx, val);
+    } else {
+        v = __JS_NewFloat64(ctx, val);
+    }
+    return v;
+}
+
+static js_force_inline JSValue JS_NewUint32(JSContext *ctx, uint32_t val)
+{
+    JSValue v;
+    if (val <= 0x7fffffff) {
+        v = JS_NewInt32(ctx, val);
+    } else {
+        v = __JS_NewFloat64(ctx, val);
+    }
+    return v;
+}
 
 JSValue JS_NewBigInt64(JSContext *ctx, int64_t v);
 JSValue JS_NewBigUint64(JSContext *ctx, uint64_t v);
+
+static js_force_inline JSValue JS_NewFloat64(JSContext *ctx, double d)
+{
+    int32_t val;
+    union {
+        double d;
+        uint64_t u;
+    } u, t;
+    if (d >= INT32_MIN && d <= INT32_MAX) {
+        u.d = d;
+        val = (int32_t)d;
+        t.d = val;
+        /* -0 cannot be represented as integer, so we compare the bit
+           representation */
+        if (u.u == t.u)
+            return JS_MKVAL(JS_TAG_INT, val);
+    }
+    return __JS_NewFloat64(ctx, d);
+}
 
 static inline JS_BOOL JS_IsNumber(JSValueConst v)
 {
@@ -573,7 +634,9 @@ static inline JS_BOOL JS_IsObject(JSValueConst v)
 
 JSValue JS_Throw(JSContext *ctx, JSValue obj);
 JSValue JS_GetException(JSContext *ctx);
+JS_BOOL JS_HasException(JSContext *ctx);
 JS_BOOL JS_IsError(JSContext *ctx, JSValueConst val);
+void JS_SetUncatchableError(JSContext *ctx, JSValueConst val, JS_BOOL flag);
 void JS_ResetUncatchableError(JSContext *ctx);
 JSValue JS_NewError(JSContext *ctx);
 JSValue __js_printf_like(2, 3) JS_ThrowSyntaxError(JSContext *ctx, const char *fmt, ...);
@@ -621,6 +684,10 @@ static inline JSValue JS_DupValueRT(JSRuntime *rt, JSValueConst v)
     }
     return (JSValue)v;
 }
+
+JS_BOOL JS_StrictEq(JSContext *ctx, JSValueConst op1, JSValueConst op2);
+JS_BOOL JS_SameValue(JSContext *ctx, JSValueConst op1, JSValueConst op2);
+JS_BOOL JS_SameValueZero(JSContext *ctx, JSValueConst op1, JSValueConst op2);
 
 int JS_ToBool(JSContext *ctx, JSValueConst val); /* return -1 for JS_EXCEPTION */
 int JS_ToInt32(JSContext *ctx, int32_t *pres, JSValueConst val);
@@ -765,6 +832,23 @@ JSValue JS_NewArrayBuffer(JSContext *ctx, uint8_t *buf, size_t len,
 JSValue JS_NewArrayBufferCopy(JSContext *ctx, const uint8_t *buf, size_t len);
 void JS_DetachArrayBuffer(JSContext *ctx, JSValueConst obj);
 uint8_t *JS_GetArrayBuffer(JSContext *ctx, size_t *psize, JSValueConst obj);
+
+typedef enum JSTypedArrayEnum {
+    JS_TYPED_ARRAY_UINT8C = 0,
+    JS_TYPED_ARRAY_INT8,
+    JS_TYPED_ARRAY_UINT8,
+    JS_TYPED_ARRAY_INT16,
+    JS_TYPED_ARRAY_UINT16,
+    JS_TYPED_ARRAY_INT32,
+    JS_TYPED_ARRAY_UINT32,
+    JS_TYPED_ARRAY_BIG_INT64,
+    JS_TYPED_ARRAY_BIG_UINT64,
+    JS_TYPED_ARRAY_FLOAT32,
+    JS_TYPED_ARRAY_FLOAT64,
+} JSTypedArrayEnum;
+
+JSValue JS_NewTypedArray(JSContext *ctx, int argc, JSValueConst *argv,
+                         JSTypedArrayEnum array_type);
 JSValue JS_GetTypedArrayBuffer(JSContext *ctx, JSValueConst obj,
                                size_t *pbyte_offset,
                                size_t *pbyte_length,
@@ -994,6 +1078,10 @@ int JS_SetModuleExport(JSContext *ctx, JSModuleDef *m, const char *export_name,
                        JSValue val);
 int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
                            const JSCFunctionListEntry *tab, int len);
+
+/* WeakRef support */
+JSValue JS_NewWeakRef(JSContext *ctx, JSValueConst target);
+JSValue JS_DerefWeakRef(JSContext *ctx, JSValueConst weakref);
 
 /*-------begin fuctions for v8 api---------*/
 JSValue JS_NewFloat64_(JSContext *ctx, double d);
