@@ -117,11 +117,6 @@ typedef const struct __JSValue *JSValueConst;
 
 #define JS_NAN JS_MKVAL(JS_TAG_FLOAT64, 1)
 
-static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
-{
-    return JS_MKVAL(JS_TAG_FLOAT64, (int)d);
-}
-
 static inline JS_BOOL JS_VALUE_IS_NAN(JSValue v)
 {
     return 0;
@@ -509,64 +504,9 @@ int JS_IsRegisteredClass(JSRuntime *rt, JSClassID class_id);
 
 /* value handling */
 
-static js_force_inline JSValue JS_NewBool(JSContext *ctx, JS_BOOL val)
-{
-    return JS_MKVAL(JS_TAG_BOOL, (val != 0));
-}
-
-static js_force_inline JSValue JS_NewInt32(JSContext *ctx, int32_t val)
-{
-    return JS_MKVAL(JS_TAG_INT, val);
-}
-
-static js_force_inline JSValue JS_NewCatchOffset(JSContext *ctx, int32_t val)
-{
-    return JS_MKVAL(JS_TAG_CATCH_OFFSET, val);
-}
-
-static js_force_inline JSValue JS_NewInt64(JSContext *ctx, int64_t val)
-{
-    JSValue v;
-    if (val == (int32_t)val) {
-        v = JS_NewInt32(ctx, val);
-    } else {
-        v = __JS_NewFloat64(ctx, val);
-    }
-    return v;
-}
-
-static js_force_inline JSValue JS_NewUint32(JSContext *ctx, uint32_t val)
-{
-    JSValue v;
-    if (val <= 0x7fffffff) {
-        v = JS_NewInt32(ctx, val);
-    } else {
-        v = __JS_NewFloat64(ctx, val);
-    }
-    return v;
-}
 
 JSValue JS_NewBigInt64(JSContext *ctx, int64_t v);
 JSValue JS_NewBigUint64(JSContext *ctx, uint64_t v);
-
-static js_force_inline JSValue JS_NewFloat64(JSContext *ctx, double d)
-{
-    int32_t val;
-    union {
-        double d;
-        uint64_t u;
-    } u, t;
-    if (d >= INT32_MIN && d <= INT32_MAX) {
-        u.d = d;
-        val = (int32_t)d;
-        t.d = val;
-        /* -0 cannot be represented as integer, so we compare the bit
-           representation */
-        if (u.u == t.u)
-            return JS_MKVAL(JS_TAG_INT, val);
-    }
-    return __JS_NewFloat64(ctx, d);
-}
 
 static inline JS_BOOL JS_IsNumber(JSValueConst v)
 {
