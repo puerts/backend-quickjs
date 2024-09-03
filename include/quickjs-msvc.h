@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#define QUICKJS_VERSION 20240214
+
 #if defined(__GNUC__) || defined(__clang__)
 #define js_likely(x)          __builtin_expect(!!(x), 1)
 #define js_unlikely(x)        __builtin_expect(!!(x), 0)
