@@ -323,7 +323,7 @@ jobs:
     if: ${{ github.event.inputs.tag_date != '' }}
     needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux,build_ohos,build_wasm]
     steps:
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v3
         with:
           name: qjs_v8_bin
           path: qjs_v8_bin/
