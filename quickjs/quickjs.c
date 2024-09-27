@@ -28,7 +28,11 @@
 #include <inttypes.h>
 #include <string.h>
 #include <assert.h>
+
+#if !defined(__SWITCH__)
 #include <sys/time.h>
+#endif
+
 #include <time.h>
 #include <fenv.h>
 #include <math.h>
@@ -76,6 +80,13 @@
 #define CONFIG_STACK_CHECK
 #endif
 
+#if defined(__SWITCH__)
+struct timeval
+{
+   long long      tv_sec;     // seconds
+   long long tv_usec;    // microseconds
+};
+#endif
 
 /* dump object free */
 //#define DUMP_FREE
