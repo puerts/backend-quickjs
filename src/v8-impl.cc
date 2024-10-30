@@ -486,6 +486,7 @@ MaybeLocal<Value> Script::Run(Local<Context> context) {
 
     String::Utf8Value source(isolate, source_);
     const char *filename = resource_name_.IsEmpty() ? "eval" : *String::Utf8Value(isolate, resource_name_.ToLocalChecked());
+    JS_UpdateStackTop(isolate->runtime_);
     auto ret = JS_Eval(context->context_, *source, source.length(), filename, JS_EVAL_TYPE_GLOBAL);
 
     return ProcessResult(isolate, ret);
@@ -816,6 +817,8 @@ MaybeLocal<Value> Function::Call(Local<Context> context,
         //isolate->Escape(*argv[i]);
         js_argv[i] = argv[i]->value_;
     }
+    
+    JS_UpdateStackTop(isolate->runtime_);
     JSValue ret = JS_Call(context->context_, value_, *js_this, argc, js_argv);
     
     return ProcessResult(isolate, ret);
@@ -829,6 +832,7 @@ MaybeLocal<Object> Function::NewInstance(Local<Context> context, int argc, Local
         js_argv[i] = argv[i]->value_;
     }
     
+    JS_UpdateStackTop(isolate->runtime_);
     JSValue ret = JS_CallConstructor(context->context_, value_, argc, js_argv);
     
     auto maybe_value = ProcessResult(isolate, ret);
