@@ -1120,7 +1120,7 @@ MaybeLocal<Function> FunctionTemplate::GetFunction(Local<Context> context) {
             JS_SetOpaque(callbackInfo.this_, object_udata);
         }
         
-        callback(callbackInfo);
+        if (callback) callback(callbackInfo);
         
         if (isolate->hasPendingException_) {
             if (callbackInfo.isConstructCall && internal_field_count > 0) {
