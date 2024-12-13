@@ -34,12 +34,18 @@
 #endif
 
 #include <time.h>
+
+#if !defined(__PS__)
 #include <fenv.h>
+#endif
+
 #include <math.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
 #elif defined(__linux__)
 #include <malloc.h>
+#elif defined(__PS__)
+// #include <malloc.h>
 #elif defined(__FreeBSD__)
 #include <malloc_np.h>
 #endif
@@ -86,6 +92,19 @@ struct timeval
    long long      tv_sec;     // seconds
    long long tv_usec;    // microseconds
 };
+#endif
+
+#if defined(__PS__)
+#define _MCW_RC         0x00000300              // Rounding Control
+#define _RC_NEAR        0x00000000              //     near
+#define _RC_DOWN        0x00000100              //     down
+#define _RC_UP          0x00000200              //     up
+#define _RC_CHOP        0x00000300              //     chop
+
+#define FE_TONEAREST  _RC_NEAR
+#define FE_UPWARD     _RC_UP
+#define FE_DOWNWARD   _RC_DOWN
+#define FE_TOWARDZERO _RC_CHOP
 #endif
 
 /* dump object free */
@@ -11378,11 +11397,15 @@ static char *i64toa(char *buf_end, int64_t n, unsigned int base)
 static void js_ecvt1(double d, int n_digits, int *decpt, int *sign, char *buf,
                      int rounding_mode, char *buf1, int buf1_size)
 {
+#if defined(__PS__)
+    snprintf(buf1, buf1_size, "%+.*e", n_digits - 1, d);
+#else
     if (rounding_mode != FE_TONEAREST)
         fesetround(rounding_mode);
     snprintf(buf1, buf1_size, "%+.*e", n_digits - 1, d);
     if (rounding_mode != FE_TONEAREST)
         fesetround(FE_TONEAREST);
+#endif
     *sign = (buf1[0] == '-');
     /* mantissa */
     buf[0] = buf1[1];
@@ -11462,11 +11485,15 @@ static int js_fcvt1(char (*buf)[JS_DTOA_BUF_SIZE], double d, int n_digits,
                     int rounding_mode)
 {
     int n;
+#if defined(__PS__)
+    n = snprintf(*buf, sizeof(*buf), "%.*f", n_digits, d);
+#else
     if (rounding_mode != FE_TONEAREST)
         fesetround(rounding_mode);
     n = snprintf(*buf, sizeof(*buf), "%.*f", n_digits, d);
     if (rounding_mode != FE_TONEAREST)
         fesetround(FE_TONEAREST);
+#endif
     assert(n < sizeof(*buf));
     return n;
 }
@@ -43359,7 +43386,7 @@ static int getTimezoneOffset(int64_t time)
         }
     }
     ti = time;
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__PS__)
     {
         struct tm *tm;
         time_t gm_ti, loc_ti;
