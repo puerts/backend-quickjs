@@ -174,7 +174,7 @@ jobs:
 
   build_window_dll:
     name: Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v3
     - uses: msys2/setup-msys2@v2
@@ -209,7 +209,7 @@ jobs:
         
   build_window_dll_md:
     name: Windows MD
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v3
     - name: Insatll MSVC
@@ -246,7 +246,7 @@ jobs:
         
   build_window_dll_md_dll:
     name: Windows MD_dll
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v3
     - name: Insatll MSVC
@@ -284,7 +284,7 @@ jobs:
 
   build_window_dll32:
     name: Windows32
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v3
     - uses: msys2/setup-msys2@v2
