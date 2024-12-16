@@ -45,7 +45,8 @@
 #elif defined(__linux__)
 #include <malloc.h>
 #elif defined(__PS__)
-// #include <malloc.h>
+// #include <mm_malloc.h>
+#include <mspace.h>
 #elif defined(__FreeBSD__)
 #include <malloc_np.h>
 #endif
@@ -1739,6 +1740,10 @@ static size_t js_def_malloc_usable_size(const void *ptr)
     return 0;
 #elif defined(__linux__)
     return malloc_usable_size((void *)ptr);
+#elif defined(__PS__)
+    // return sceLibcMspaceMallocUsableSize((void *)ptr);
+    // 从 PS 的 Sample 项目来看，用的是 sceLibcMspaceMallocUsableSize 但是依然闪退，直接使用 return 0 了
+    return 0;
 #else
     /* change this to `return 0;` if compilation fails */
     return malloc_usable_size((void *)ptr);
