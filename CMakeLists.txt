@@ -44,6 +44,21 @@ if (SWITCH_PLATFORM)
     link_directories(${NS_LIB_LIST})
 endif()
 
+if (PS_PLATFORM)
+    message("using v8_qjs PS_PLATFORM >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+    set(PS_SDK_ROOT $ENV{SCE_PROSPERO_SDK_DIR})
+    set(PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include")
+    list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include_common")
+
+    set(PS_LIB_LIST "${PS_SDK_ROOT}/target/lib")\
+    add_definitions(-D__PS__)
+
+    include_directories(${PS_INCLUDE_LIST})
+    link_directories(${PS_LIB_LIST})
+
+endif()
+
 set(qjs_cflags -Wall)
 if(CMAKE_C_COMPILER_ID MATCHES "AppleClang|Clang")
     list(APPEND qjs_cflags
