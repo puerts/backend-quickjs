@@ -50,13 +50,8 @@ if (PS_PLATFORM)
     set(PS_SDK_ROOT $ENV{SCE_PROSPERO_SDK_DIR})
     set(PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include")
     list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include_common")
-    # list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/host_tools/lib/clang/include")
-    # list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/host_tools/include")
-    # list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include_common")
 
-    set(PS_LIB_LIST "${PS_SDK_ROOT}/target/lib")
-    # list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/host_tools/lib")
-    # list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include_common")
+    set(PS_LIB_LIST "${PS_SDK_ROOT}/target/lib")\
     add_definitions(-D__PS__)
 
     include_directories(${PS_INCLUDE_LIST})

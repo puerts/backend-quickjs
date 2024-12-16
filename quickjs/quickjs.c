@@ -45,7 +45,6 @@
 #elif defined(__linux__)
 #include <malloc.h>
 #elif defined(__PS__)
-// #include <mm_malloc.h>
 #include <mspace.h>
 #elif defined(__FreeBSD__)
 #include <malloc_np.h>
