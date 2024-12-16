@@ -51,7 +51,7 @@ if (PS_PLATFORM)
     set(PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include")
     list(APPEND PS_INCLUDE_LIST "${PS_SDK_ROOT}/target/include_common")
 
-    set(PS_LIB_LIST "${PS_SDK_ROOT}/target/lib")\
+    set(PS_LIB_LIST "${PS_SDK_ROOT}/target/lib")
     add_definitions(-D__PS__)
 
     include_directories(${PS_INCLUDE_LIST})
