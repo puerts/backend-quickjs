@@ -31,6 +31,7 @@
 #include "libunicode.h"
 #include "libunicode-table.h"
 
+// note: stored as 4 bit tag, not much room left
 enum {
     RUN_TYPE_U,
     RUN_TYPE_L,
@@ -240,7 +241,7 @@ int lre_canonicalize(uint32_t c, BOOL is_unicode)
     } else {
         uint32_t v, code, len;
         int idx, idx_min, idx_max;
-
+        
         idx_min = 0;
         idx_max = countof(case_conv_table1) - 1;
         while (idx_min <= idx_max) {
@@ -262,11 +263,7 @@ int lre_canonicalize(uint32_t c, BOOL is_unicode)
 
 static uint32_t get_le24(const uint8_t *ptr)
 {
-#if defined(__x86__) || defined(__x86_64__)
-    return *(uint16_t *)ptr | (ptr[2] << 16);
-#else
     return ptr[0] | (ptr[1] << 8) | (ptr[2] << 16);
-#endif
 }
 
 #define UNICODE_INDEX_BLOCK_LEN 32
@@ -532,8 +529,6 @@ int cr_invert(CharRange *cr)
     cr_compress(cr);
     return 0;
 }
-
-#ifdef CONFIG_ALL_UNICODE
 
 BOOL lre_is_id_start(uint32_t c)
 {
@@ -897,13 +892,6 @@ static void sort_cc(int *buf, int len)
                 buf[k + 1] = ch1;
                 j++;
             }
-#if 0
-            printf("cc:");
-            for(k = start; k < j; k++) {
-                printf(" %3d", unicode_get_cc(buf[k]));
-            }
-            printf("\n");
-#endif
             i = j;
         }
     }
@@ -1063,8 +1051,8 @@ int unicode_script(CharRange *cr,
     int script_idx;
     const uint8_t *p, *p_end;
     uint32_t c, c1, b, n, v, v_len, i, type;
-    CharRange cr1_s, *cr1;
-    CharRange cr2_s, *cr2 = &cr2_s;
+    CharRange cr1_s = { 0 }, *cr1 = NULL;
+    CharRange cr2_s = { 0 }, *cr2 = &cr2_s;
     BOOL is_common;
 
     script_idx = unicode_find_name(unicode_script_name_table, script_name);
@@ -1731,42 +1719,6 @@ int unicode_prop(CharRange *cr, const char *prop_name)
                                POP_XOR,
                                POP_END);
         break;
-#if 0
-    case UNICODE_PROP_ID_Start:
-        ret = unicode_prop_ops(cr,
-                               POP_GC, M(Lu) | M(Ll) | M(Lt) | M(Lm) | M(Lo) | M(Nl),
-                               POP_PROP, UNICODE_PROP_Other_ID_Start,
-                               POP_UNION,
-                               POP_PROP, UNICODE_PROP_Pattern_Syntax,
-                               POP_PROP, UNICODE_PROP_Pattern_White_Space,
-                               POP_UNION,
-                               POP_INVERT,
-                               POP_INTER,
-                               POP_END);
-        break;
-    case UNICODE_PROP_ID_Continue:
-        ret = unicode_prop_ops(cr,
-                               POP_GC, M(Lu) | M(Ll) | M(Lt) | M(Lm) | M(Lo) | M(Nl) |
-                               M(Mn) | M(Mc) | M(Nd) | M(Pc),
-                               POP_PROP, UNICODE_PROP_Other_ID_Start,
-                               POP_UNION,
-                               POP_PROP, UNICODE_PROP_Other_ID_Continue,
-                               POP_UNION,
-                               POP_PROP, UNICODE_PROP_Pattern_Syntax,
-                               POP_PROP, UNICODE_PROP_Pattern_White_Space,
-                               POP_UNION,
-                               POP_INVERT,
-                               POP_INTER,
-                               POP_END);
-        break;
-    case UNICODE_PROP_Case_Ignorable:
-        ret = unicode_prop_ops(cr,
-                               POP_GC, M(Mn) | M(Cf) | M(Lm) | M(Sk),
-                               POP_PROP, UNICODE_PROP_Case_Ignorable1,
-                               POP_XOR,
-                               POP_END);
-        break;
-#else
         /* we use the existing tables */
     case UNICODE_PROP_ID_Continue:
         ret = unicode_prop_ops(cr,
@@ -1775,7 +1727,6 @@ int unicode_prop(CharRange *cr, const char *prop_name)
                                POP_XOR,
                                POP_END);
         break;
-#endif
     default:
         if (prop_idx >= countof(unicode_prop_table))
             return -2;
@@ -1784,5 +1735,3 @@ int unicode_prop(CharRange *cr, const char *prop_name)
     }
     return ret;
 }
-
-#endif /* CONFIG_ALL_UNICODE */

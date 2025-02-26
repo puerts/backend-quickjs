@@ -130,7 +130,7 @@ Isolate::Isolate(void* external_runtime) : current_context_(nullptr) {
     //大坑，JSClassID是uint32_t，但Object里的class_id类型为uint16_t，JS_NewClass会把class定义放到以uint32_t索引的数组成员//////////
     //后续如果用这个class_id新建对象，如果class_id大于uint16_t将会被截值，后续释放对象时，会找错class，可能会导致严重后果（不释放，或者调用错误的free）//////////
     class_id_ = 0;
-    JS_NewClassID(&class_id_);
+    JS_NewClassID(runtime_, &class_id_);
     JS_NewClass(runtime_, class_id_, &cls_def);
 };
 
@@ -186,25 +186,11 @@ void Isolate::handleException() {
             std::cerr << "Uncaught exception(null)" << std::endl;
             return;
         }
-        JSValue fileNameVal = JS_GetProperty(current_context_->context_, ex, JS_ATOM_fileName);
-        JSValue lineNumVal = JS_GetProperty(current_context_->context_, ex, JS_ATOM_lineNumber);
-        
+
         auto msg = JS_ToCString(current_context_->context_, ex);
-        auto fileName = JS_ToCString(current_context_->context_, fileNameVal);
-        auto lineNum = JS_ToCString(current_context_->context_, lineNumVal);
-        if (JS_IsUndefined(fileNameVal)) {
-            std::cerr << "Uncaught " << msg << std::endl;
-        }
-        else {
-            std::cerr << fileName << ":" << lineNum << ": Uncaught " << msg << std::endl;
-        }
+        std::cerr << "Uncaught " << msg << std::endl;
         
-        JS_FreeCString(current_context_->context_, lineNum);
-        JS_FreeCString(current_context_->context_, fileName);
         JS_FreeCString(current_context_->context_, msg);
-        
-        JS_FreeValue(current_context_->context_, lineNumVal);
-        JS_FreeValue(current_context_->context_, fileNameVal);
         
         JS_FreeValue(current_context_->context_, ex);
     }
@@ -255,23 +241,11 @@ Local<Message> Exception::CreateMessage(Isolate* isolate_, Local<Value> exceptio
     if (!JS_IsObject(catched_)) {
         return Local<Message>();
     }
-    JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_fileName);
-    JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, catched_, JS_ATOM_lineNumber);
-    
+
     Local<Message> message(new Message());
-    
-    if (JS_IsUndefined(fileNameVal)) {
-        message->resource_name_ = "<unknow>";
-        message->line_number_ = - 1;
-    } else {
-        const char* fileName = JS_ToCString(isolate_->current_context_->context_, fileNameVal);
-        message->resource_name_ = fileName;
-        JS_FreeCString(isolate_->current_context_->context_, fileName);
-        JS_ToInt32(isolate_->current_context_->context_, &message->line_number_, lineNumVal);
-    }
-    
-    JS_FreeValue(isolate_->current_context_->context_, lineNumVal);
-    JS_FreeValue(isolate_->current_context_->context_, fileNameVal);
+
+    message->resource_name_ = "<unknow>";
+    message->line_number_ = - 1;
     
     return message;
 }
@@ -1352,9 +1326,12 @@ uint32_t Array::Length() const {
 }
 
 Maybe<bool> Array::Delete(Local<Context> context, uint32_t index) {
-    if (JS_DeletePropertyInt64(context->context_, value_, index, JS_PROP_THROW) < 0) {
+    JSAtom prop = JS_NewAtomUInt32(context->context_, index);
+    if (JS_DeleteProperty(context->context_, value_, prop, JS_PROP_THROW) < 0) {
+        JS_FreeAtom(context->context_, prop);
         return Maybe<bool>(false);
     }
+    JS_FreeAtom(context->context_, prop);
     return Maybe<bool>(true);
 }
 
@@ -1404,23 +1381,11 @@ Local<class Message> TryCatch::Message() const {
     if (!JS_IsObject(ex)) {
         return Local<class Message>();
     }
-    JSValue fileNameVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_fileName);
-    JSValue lineNumVal = JS_GetProperty(isolate_->current_context_->context_, ex, JS_ATOM_lineNumber);
     
     Local<class Message> message(new class Message());
-    
-    if (JS_IsUndefined(fileNameVal)) {
-        message->resource_name_ = "<unknow>";
-        message->line_number_ = - 1;
-    } else {
-        const char* fileName = JS_ToCString(isolate_->current_context_->context_, fileNameVal);
-        message->resource_name_ = fileName;
-        JS_FreeCString(isolate_->current_context_->context_, fileName);
-        JS_ToInt32(isolate_->current_context_->context_, &message->line_number_, lineNumVal);
-    }
-    
-    JS_FreeValue(isolate_->current_context_->context_, lineNumVal);
-    JS_FreeValue(isolate_->current_context_->context_, fileNameVal);
+
+    message->resource_name_ = "<unknow>";
+    message->line_number_ = - 1;
     
     return message;
 }

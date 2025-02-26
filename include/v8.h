@@ -20,7 +20,7 @@
 
 #include "v8config.h"     // NOLINT(build/include_directory)
  
-#include "quickjs-msvc.h"
+#include "quickjs.h"
 
 #define JS_TAG_EXTERNAL (JS_TAG_FLOAT64 + 1)
 
