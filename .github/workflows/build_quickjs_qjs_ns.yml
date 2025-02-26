@@ -26,9 +26,9 @@ jobs:
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r puer-build.json $GITHUB_WORKSPACE/qjs/quickjs/
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_macos
         path: ~/qjs/**/*
 
   build_macos_dll:
@@ -42,9 +42,9 @@ jobs:
         chmod +x make_osx_dylib.sh
         sh ./make_osx_dylib.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_macos_dll
         path: ~/qjs/**/*
 
   build_macos_arm64:
@@ -59,9 +59,9 @@ jobs:
         sh ./make_osx_arm64.sh 1
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_macos_arm64
         path: ~/qjs/**/*
         
   build_ios:
@@ -75,9 +75,9 @@ jobs:
         chmod +x make_ios.sh
         sh ./make_ios.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_ios
         path: ~/qjs/**/*
 
   build_android:
@@ -97,11 +97,11 @@ jobs:
         chmod +x make_android.sh
         ANDROID_NDK=~/android-ndk-r21b ./make_android.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_android
         path: ~/qjs/**/*
-        
+  
   build_ohos:
     if: github.event.inputs.is_build_for_ohos == 'true'
     name: OHOS 
@@ -121,9 +121,9 @@ jobs:
         chmod +x make_ohos.sh
         OHOS_NDK_HOME=~/ohos-sdk/linux/native ./make_ohos.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_ohos
         path: ~/qjs/**/*
         
   build_linux:
@@ -144,11 +144,11 @@ jobs:
         chmod +x make_linux64.sh
         ./make_linux64.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_linux
         path: ~/qjs/**/*
-  
+        
   build_wasm:
     name: wasm 
     runs-on: ubuntu-20.04
@@ -167,9 +167,9 @@ jobs:
         chmod +x make_wasm.sh
         ./make_wasm.sh 1
         cp -r $GITHUB_WORKSPACE/qjs ~/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_was
         path: ~/qjs/**/*
 
   build_window_dll:
@@ -202,9 +202,9 @@ jobs:
         cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_window_dll
         path: qjs/**/*
         
   build_window_dll_md:
@@ -239,9 +239,9 @@ jobs:
         cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64MD/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64MD/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_window_dll_md
         path: qjs/**/*
         
   build_window_dll_md_dll:
@@ -277,9 +277,9 @@ jobs:
         cp build/libquickjs.dll.a qjs/quickjs/Lib/Win64DLL/
         cp /mingw64/bin/libgcc_s_seh-1.dll qjs/quickjs/Lib/Win64DLL/
         cp /mingw64/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win64DLL/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_window_dll_md_dll
         path: qjs/**/*
 
   build_window_dll32:
@@ -313,9 +313,9 @@ jobs:
         cp build/libquickjs.dll.a qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libgcc_s_dw2-1.dll qjs/quickjs/Lib/Win32/
         cp /mingw32/bin/libwinpthread-1.dll qjs/quickjs/Lib/Win32/
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: qjs_v8_bin
+        name: qjs_v8_bin_window_dll32
         path: qjs/**/*
  
   publish:
@@ -323,10 +323,11 @@ jobs:
     if: ${{ github.event.inputs.tag_date != '' }}
     needs: [build_android,build_window_dll,build_window_dll32,build_window_dll_md,build_window_dll_md_dll,build_macos,build_macos_dll,build_macos_arm64,build_ios,build_linux,build_ohos,build_wasm]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: qjs_v8_bin
+          pattern: qjs_v8_bin_*
           path: qjs_v8_bin/
+          merge-multiple: true
           
       - name: Create Release Asset
         run: |
