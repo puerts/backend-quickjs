@@ -27,6 +27,8 @@
 #ifndef QUICKJS_H
 #define QUICKJS_H
 
+#define QUICKJS_VERSION 20240214
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
