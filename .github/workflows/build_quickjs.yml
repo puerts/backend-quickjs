@@ -24,6 +24,7 @@ jobs:
         chmod +x make_osx.sh
         sh ./make_osx.sh
         cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
+        cp quickjs/quickjs.h $GITHUB_WORKSPACE/qjs/quickjs/Inc/
         cp -r puer-build.json $GITHUB_WORKSPACE/qjs/quickjs/
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v4
@@ -57,7 +58,6 @@ jobs:
         cd $GITHUB_WORKSPACE
         chmod +x make_osx_arm64.sh
         sh ./make_osx_arm64.sh
-        cp -r include $GITHUB_WORKSPACE/qjs/quickjs/Inc
         cp -r $GITHUB_WORKSPACE/qjs ~/
     - uses: actions/upload-artifact@v4
       with:
