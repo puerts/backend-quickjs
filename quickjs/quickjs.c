@@ -55995,7 +55995,7 @@ JSValue JS_NewMap(JSContext *ctx)
         goto fail;
     init_list_head(&s->records);
     s->is_weak = FALSE;
-    JS_SetOpaque(obj, s);
+    JS_SetOpaqueInternal(obj, s);
     s->hash_size = 1;
     s->hash_table = js_malloc(ctx, sizeof(s->hash_table[0]) * s->hash_size);
     if (!s->hash_table)
@@ -56090,7 +56090,7 @@ JSValue JS_NewSet(JSContext *ctx)
         goto fail;
     init_list_head(&s->records);
     s->is_weak = FALSE;
-    JS_SetOpaque(obj, s);
+    JS_SetOpaqueInternal(obj, s);
     s->hash_size = 1;
     s->hash_table = js_malloc(ctx, sizeof(s->hash_table[0]) * s->hash_size);
     if (!s->hash_table)
