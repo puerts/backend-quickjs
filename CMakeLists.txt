@@ -79,7 +79,7 @@ endif()
 
 set(SRC_FILES
         quickjs/cutils.c
-        quickjs/libbf.c
+        quickjs/dtoa.c
         quickjs/libregexp.c
         quickjs/libunicode.c
         quickjs/quickjs.c
@@ -90,7 +90,11 @@ endif()
 
 file(STRINGS "quickjs/_VERSION" QJS_VERSION_STR)
 
-set (CMAKE_CXX_STANDARD 14)
+if (PS_PLATFORM)
+    set (CMAKE_CXX_STANDARD 17)
+else()
+    set (CMAKE_CXX_STANDARD 20)
+endif()
 
 include_directories(
     include
