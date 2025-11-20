@@ -174,7 +174,7 @@ jobs:
 
   build_window_dll:
     name: Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v3
     - uses: msys2/setup-msys2@v2
