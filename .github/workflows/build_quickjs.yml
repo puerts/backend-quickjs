@@ -82,7 +82,7 @@ jobs:
 
   build_android:
     name: Android 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Install NDK
@@ -105,7 +105,7 @@ jobs:
   build_ohos:
     if: github.event.inputs.is_build_for_ohos == 'true'
     name: OHOS 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Install NDK
@@ -128,7 +128,7 @@ jobs:
         
   build_linux:
     name: Linux 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Install LibC++
@@ -151,7 +151,7 @@ jobs:
         
   build_wasm:
     name: wasm 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Install LibC++
