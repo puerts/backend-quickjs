@@ -325,7 +325,7 @@ bool Value::IsArray() const {
 }
 
 bool Value::IsBigInt() const {
-    return JS_VALUE_GET_TAG(value_) == JS_TAG_BIG_INT;
+    return JS_VALUE_GET_TAG(value_) == JS_TAG_BIG_INT || JS_VALUE_GET_TAG(value_) == JS_TAG_SHORT_BIG_INT;
 }
 
 bool Value::IsBoolean() const {
