@@ -48759,7 +48759,18 @@ static void map_delete_record(JSRuntime *rt, JSMapState *s, JSMapRecord *mr)
 {
     if (mr->empty)
         return;
-    
+    uint32_t h = map_hash_key(mr->key, s->hash_bits);
+    JSMapRecord* curr, * prev = NULL;
+    for (curr = s->hash_table[h]; curr != NULL; prev = curr, curr = curr->hash_next) {
+        if (curr == mr) {
+            if (prev)
+                prev->hash_next = mr->hash_next;
+            else
+                s->hash_table[h] = mr->hash_next;
+            mr->hash_next = NULL;
+            break;
+        }
+    }//加入移除操作
     if (s->is_weak) {
         js_weakref_free(rt, mr->key);
     } else {
